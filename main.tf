@@ -1,9 +1,10 @@
 // --------------------------------------------
 // EC2 instance
 // --------------------------------------------
-# Assign a subnet ID per availibilty zone, this is to balance instances between zones
+# Assign a subnet ID per availibilty zone, this is to balance instances between zones,
+# if no VPC ID is specified than it is assumed that all resources will be deployed in default VPC and this variable is not needed
 locals {
-  ec2_subnet_id = var.index % 2 == 0 ? var.subnet_ids[var.availabilty_zones[0]] : var.subnet_ids[var.availabilty_zones[1]]
+  ec2_subnet_id = var.vpc_id == null ? null : (var.index % 2 == 0 ? var.subnet_ids[var.availabilty_zones[0]] : var.subnet_ids[var.availabilty_zones[1]])
 }
 
 # Create IAM Role
