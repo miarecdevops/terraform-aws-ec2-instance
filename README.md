@@ -1,6 +1,9 @@
 # terraform module `instance`
-
-terraform module to create a EC2 instance
+Terraform module that creates the following in AWS
+ - EC2 Instance
+ - Route53 A record
+ - Security Group/Security Group Rule
+ - IAM policy 
 
 ## Module Variables
 
