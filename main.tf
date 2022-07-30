@@ -113,7 +113,7 @@ resource "aws_route53_record" "record_public" {
   count = var.route53_zone_id_public == null ? 0 : 1
 
   zone_id = var.route53_zone_id_public
-  name    = "${var.route53_a_record}${var.index}.${var.route53_domain_public}"
+  name    = "${var.route53_a_record}.${var.route53_domain_public}"
   type    = "A"
   ttl     = var.route53_ttl
   records = [aws_instance.instance.public_ip]
@@ -124,7 +124,7 @@ resource "aws_route53_record" "record_private" {
   count = var.route53_zone_id_private == null ? 0 : 1
 
   zone_id = var.route53_zone_id_private
-  name    = "${var.route53_a_record}${var.index}.${var.route53_domain_private}"
+  name    = "${var.route53_a_record}.${var.route53_domain_private}"
   type    = "A"
   ttl     = var.route53_ttl
   records = [aws_instance.instance.private_ip]
