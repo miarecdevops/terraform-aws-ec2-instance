@@ -1,7 +1,7 @@
 variable "environment" {
   description = "Name of environment (all tags will be prefixed with such name)"
   type        = string
-  default     = "example-ec2-instance-module-with-dns"
+  default     = "ec2-instance-module-with-dns"
 }
 
 variable "role" {

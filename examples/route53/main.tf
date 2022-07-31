@@ -15,6 +15,14 @@ provider "aws" {
 module "instance" {
   source = "../../"
 
+  depends_on = [
+    # Add explicit dependency on the private zone, forcing 
+    # Terraform to wait till zone is successfully created 
+    # before the module is run.
+    # Otherwise, it may run the module before the Route53 zone is ready.
+    aws_route53_zone.private
+  ]
+
   environment = var.environment
   role = var.role
 
