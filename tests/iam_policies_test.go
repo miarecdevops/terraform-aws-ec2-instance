@@ -10,10 +10,10 @@ import (
 	test_structure "github.com/gruntwork-io/terratest/modules/test-structure"
 )
 
-func TestDefaultVPC(t *testing.T) {
+func TestIAMPolicies(t *testing.T) {
 	t.Parallel()
 
-	exampleFolder := test_structure.CopyTerraformFolderToTemp(t, "../", "examples/default-vpc")
+	exampleFolder := test_structure.CopyTerraformFolderToTemp(t, "../", "examples/iam-policies")
 
 	// At the end of the test, run `terraform destroy` to clean up any resources that were created
 	defer test_structure.RunTestStage(t, "teardown", func() {
@@ -23,7 +23,7 @@ func TestDefaultVPC(t *testing.T) {
 
 	// Deploy the example
 	test_structure.RunTestStage(t, "setup", func() {
-		terraformOptions := configureTerraformOptionsDefaultVPC(t, exampleFolder)
+		terraformOptions := configureTerraformOptionsIAMPolicies(t, exampleFolder)
 
 		// Save the options and key pair so later test stages can use them
 		test_structure.SaveTerraformOptions(t, exampleFolder, terraformOptions)
@@ -49,14 +49,14 @@ func TestDefaultVPC(t *testing.T) {
 
 }
 
-func configureTerraformOptionsDefaultVPC(t *testing.T, exampleFolder string) *terraform.Options {
+func configureTerraformOptionsIAMPolicies(t *testing.T, exampleFolder string) *terraform.Options {
 	// A unique ID we can use to namespace resources so we don't clash with anything already in the AWS account or
 	// tests running in parallel
 	uniqueID := random.UniqueId()
 
 	// Give the resources in the Terraform code a name with a unique ID so it doesn't clash
 	// with anything else in the AWS account.
-	environmentName := fmt.Sprintf("terratest-instance-default-vpc-%s", uniqueID)
+	environmentName := fmt.Sprintf("terratest-instance-iam-policies-%s", uniqueID)
 
 	// Pick a random AWS region to test in. This helps ensure your code works in all regions.
 	//awsRegion := aws.GetRandomStableRegion(t, []string{"us-west-1", "us-west-2", "us-east-1", "us-east-2"}, nil)
