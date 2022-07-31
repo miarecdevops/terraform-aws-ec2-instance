@@ -1,4 +1,0 @@
-./priv_key.pem
-.terraform.lock.hcl
-terraform.tfstate*
-.terraform/

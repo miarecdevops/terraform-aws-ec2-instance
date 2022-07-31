@@ -1,7 +1,7 @@
 variable "environment" {
   description = "Name of environment (all tags will be prefixed with such name)"
   type        = string
-  default     = "example-ec2-instance-module-default-vpc"
+  default     = "example-ec2-instance-module-custom-vpc"
 }
 
 variable "role" {
@@ -26,4 +26,19 @@ variable "instance_type" {
   description = "EC2 instance type"
   type        = string
   default     = "t3.micro"
+}
+
+# --------------------------------------------
+# Networking
+# --------------------------------------------
+variable "vpc_cidr" {
+  description = "The CIDR block of the VPC"
+  type        = string
+  default     = "10.0.0.0/16"
+}
+
+variable "availability_zones" {
+  description = "The availability sones that will be used for the VPC's subnets"
+  type        = list(string)
+  default     = ["us-west-2a"]
 }
