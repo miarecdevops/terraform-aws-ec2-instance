@@ -1,7 +1,7 @@
 variable "environment" {
   description = "Name of environment (all tags will be prefixed with such name)"
   type        = string
-  default     = "ec2-instance-module-default-vpc"
+  default     = "ec2-instance-module-with-policies"
 }
 
 variable "role" {

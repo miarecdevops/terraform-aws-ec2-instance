@@ -47,16 +47,16 @@ resource "aws_iam_role" "role" {
 # Create IAM Role Policies and attach to IAM Role
 resource "aws_iam_role_policy" "policy" {
   for_each = var.iam_policies
-  name = "${var.environment}-${var.role}-policy"
+  name = "${var.environment}-${var.role}-${each.key}-policy"
   role = aws_iam_role.role[0].id
 
   policy = jsonencode({
     Version = "2012-10-17"
     Statement = [
       {
-        Action   = [each.value.action]
-        Effect   = each.value.effect
-        Resource = each.value.resource
+        Action   = each.value.Action
+        Effect   = each.value.Effect
+        Resource = each.value.Resource
       },
     ]
   })
