@@ -97,6 +97,12 @@ variable "route53_zone" {
   default     = null
 }
 
+variable "route53_zone_private" {
+  type        = bool
+  description = "Set to TRUE if the Route53 is private (i.e. visible within VPC only)"
+  default     = false
+}
+
 variable "route53_ttl" {
   type        = number
   description = "TTL of the DNS record, in seconds"

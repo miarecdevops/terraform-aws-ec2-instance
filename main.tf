@@ -129,18 +129,18 @@ resource "aws_instance" "instance" {
 # Create Route53 A record for Public resolution if in Public Subnet
 # -------------------------------------------
 data "aws_route53_zone" "domain" {
-  count        = var.route53_zone != null ? 1 : 0
+  count        = var.route53_a_record != null ? 1 : 0
   name         = var.route53_zone
-  private_zone = false
+  private_zone = var.route53_zone_private
 }
 
 resource "aws_route53_record" "record" {
-  count = var.route53_zone != null ? 1 : 0
+  count = var.route53_a_record != null ? 1 : 0
 
   zone_id = data.aws_route53_zone.domain[0].zone_id
   name    = "${var.route53_a_record}.${data.aws_route53_zone.domain[0].name}"
   type    = "A"
   ttl     = var.route53_ttl
-  records = [aws_instance.instance.public_ip]
+  records = [var.route53_zone_private == true ? aws_instance.instance.private_ip : aws_instance.instance.public_ip]
 }
 
