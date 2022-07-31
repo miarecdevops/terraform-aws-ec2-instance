@@ -2,22 +2,18 @@ output "instance_id" {
   value = aws_instance.instance.id
 }
 
-output "private_ip_address" {
+output "private_ip" {
     value = aws_instance.instance.private_ip
 }
 
-output "public_ip_address" {
+output "public_ip" {
     value = aws_instance.instance.public_ip
 }
 
 output "fqdn" {
-    value = aws_route53_record.record_public[*].fqdn
-}
-
-output "private_fqdn" {
-    value = aws_route53_record.record_private[*].fqdn
+    value = length(aws_route53_record.record) > 0 ? aws_route53_record.record[0].fqdn : null
 }
 
 output "iam_role" {
-    value = aws_iam_role.role.arn
+    value = length(aws_iam_role.role) > 0 ? aws_iam_role.role[0].arn : null
 }

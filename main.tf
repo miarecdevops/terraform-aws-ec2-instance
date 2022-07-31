@@ -1,15 +1,27 @@
 // --------------------------------------------
-// EC2 instance
+// Network
 // --------------------------------------------
-# Assign a subnet ID per availibilty zone, this is to balance instances between zones,
-# if no VPC ID is specified than it is assumed that all resources will be deployed in default VPC and this variable is not needed
-locals {
-  ec2_subnet_id = var.vpc_id == null ? null : (var.index % 2 == 0 ? var.subnet_ids[var.availabilty_zones[0]] : var.subnet_ids[var.availabilty_zones[1]])
+
+data "aws_vpc" "default" {
+  default = true
 }
 
+data "aws_subnet_ids" "all" {
+  vpc_id = var.vpc_id != null ? var.vpc_id : data.aws_vpc.default.id
+}
+
+locals {
+  vpc_id = var.vpc_id != null ? var.vpc_id : data.aws_vpc.default.id 
+  ec2_subnet_id = var.ec2_subnet_id != null ? var.ec2_subnet_id : sort(data.aws_subnet_ids.all.ids)[0]
+}
+
+
+# --------------------------------------------
 # Create IAM Role
+# --------------------------------------------
 resource "aws_iam_role" "role" {
-  name = "${var.environment}-${var.role}-${var.index}-iam_role"
+  count  = length(keys(var.iam_policies)) > 0 ? 1 : 0
+  name = "${var.environment}-${var.role}-iam_role"
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
     Statement = [
@@ -27,16 +39,16 @@ resource "aws_iam_role" "role" {
   tags = merge(
     var.tags,
     {
-     Name = "${var.environment}-${var.role}-${var.index}-iam_policy"
+     Name = "${var.environment}-${var.role}-iam_policy"
     },
   )
 }
 
 # Create IAM Role Policies and attach to IAM Role
 resource "aws_iam_role_policy" "policy" {
-  for_each = var.iam_policy
-  name = "${var.environment}-${var.role}-${var.index}-${each.key}-policy"
-  role = aws_iam_role.role.id
+  for_each = var.iam_policies
+  name = "${var.environment}-${var.role}-policy"
+  role = aws_iam_role.role[0].id
 
   policy = jsonencode({
     Version = "2012-10-17"
@@ -51,13 +63,16 @@ resource "aws_iam_role_policy" "policy" {
 }
 
 resource "aws_iam_instance_profile" "profile" {
-  name = "${var.environment}-${var.role}-${var.index}-iam_instance_policy"
-  role = aws_iam_role.role.name
+  count  = length(keys(var.iam_policies)) > 0 ? 1 : 0
+  name = "${var.environment}-${var.role}-iam_instance_policy"
+  role = aws_iam_role.role[0].name
 }
 
+# -------------------------------------------
 # Create Security Group and Rules
+# -------------------------------------------
 resource "aws_security_group" "sg" {
-  name       = "${var.environment}-${var.role}-${var.index}-security_group"
+  name       = "${var.environment}-${var.role}-security_group"
   vpc_id     = var.vpc_id
 
   lifecycle {
@@ -67,7 +82,7 @@ resource "aws_security_group" "sg" {
   tags = merge(
     var.tags,
     {
-     Name = "${var.environment}-${var.role}-${var.index}-security_group"
+     Name = "${var.environment}-${var.role}-security_group"
     },
   )
  }
@@ -84,14 +99,16 @@ resource "aws_security_group_rule" "rule" {
   security_group_id = aws_security_group.sg.id
 }
 
+# -------------------------------------------
 # Build EC2 Instance
+# -------------------------------------------
 resource "aws_instance" "instance" {
-  ami           = var.ec2_image_id
+  ami           = var.ec2_ami_id
   key_name      = var.ec2_ssh_key_name
   instance_type = var.ec2_instance_type
   subnet_id     = local.ec2_subnet_id
 
-  iam_instance_profile   = aws_iam_instance_profile.profile.id
+  iam_instance_profile   = length(aws_iam_instance_profile.profile) > 0 ? aws_iam_instance_profile.profile[0].id : null
   vpc_security_group_ids = [aws_security_group.sg.id]
 
   root_block_device {
@@ -103,29 +120,27 @@ resource "aws_instance" "instance" {
   tags = merge(
     var.tags,
     {
-     Name = "${var.environment}-${var.role}-${var.index}"
+     Name = "${var.environment}-${var.role}"
     },
   )
 }
 
+# -------------------------------------------
 # Create Route53 A record for Public resolution if in Public Subnet
-resource "aws_route53_record" "record_public" {
-  count = var.route53_zone_id_public == null ? 0 : 1
+# -------------------------------------------
+data "aws_route53_zone" "domain" {
+  count        = var.route53_zone != null ? 1 : 0
+  name         = var.route53_zone
+  private_zone = false
+}
 
-  zone_id = var.route53_zone_id_public
-  name    = "${var.route53_a_record}${var.index == 0 ? "" : var.index}.${var.route53_domain_public}"
+resource "aws_route53_record" "record" {
+  count = var.route53_zone != null ? 1 : 0
+
+  zone_id = data.aws_route53_zone.domain[0].zone_id
+  name    = "${var.route53_a_record}.${data.aws_route53_zone.domain[0].name}"
   type    = "A"
   ttl     = var.route53_ttl
   records = [aws_instance.instance.public_ip]
 }
 
-# Create Route53 A record for Private resolution
-resource "aws_route53_record" "record_private" {
-  count = var.route53_zone_id_private == null ? 0 : 1
-
-  zone_id = var.route53_zone_id_private
-  name    = "${var.route53_a_record}${var.index == 0 ? "" : var.index}.${var.route53_domain_private}"
-  type    = "A"
-  ttl     = var.route53_ttl
-  records = [aws_instance.instance.private_ip]
-}
