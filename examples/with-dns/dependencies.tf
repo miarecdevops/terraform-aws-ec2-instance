@@ -79,6 +79,11 @@ locals {
 resource "aws_route53_zone" "private" {
   name = local.route53_zone
 
+  # Amazon creates NS records by default, which are not owned by Terraform
+  # Terraform fails to destroy the aws_route53_zone due to a presense of these records.
+  # "force_destroy" is required to solve this issue
+  force_destroy = true
+
   vpc {
     vpc_id = data.aws_vpc.default.id
   }
