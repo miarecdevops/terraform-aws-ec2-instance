@@ -2,7 +2,7 @@ terraform {
   required_providers {
     aws = {
       source  = "hashicorp/aws"
-      version = "~> 3.27"
+      version = "~> 4.24"
     }
   }
 }
@@ -27,7 +27,7 @@ module "instance" {
   role = var.role
 
   vpc_id    = data.aws_vpc.default.id
-  ec2_subnet_id = sort(data.aws_subnet_ids.default.ids)[0]
+  ec2_subnet_id = sort(data.aws_subnets.default.ids)[0]
 
   ec2_instance_type = var.instance_type
   ec2_ami_id        = data.aws_ami.ubuntu.id
