@@ -6,18 +6,9 @@ data "aws_vpc" "default" {
   default = true
 }
 
-data "aws_subnets" "default" {
-  filter {
-    name   = "vpc-id"
-    values = [data.aws_vpc.default.id]
-  }
-}
-
 locals {
   vpc_id = var.vpc_id != null ? var.vpc_id : data.aws_vpc.default.id 
-  ec2_subnet_id = var.vpc_id != null ? var.ec2_subnet_id : sort(data.aws_subnets.default.ids)[0]
 }
-
 
 # --------------------------------------------
 # Create IAM Role
@@ -109,7 +100,7 @@ resource "aws_instance" "instance" {
   ami           = var.ec2_ami_id
   key_name      = var.ec2_ssh_key_name
   instance_type = var.ec2_instance_type
-  subnet_id     = local.ec2_subnet_id
+  subnet_id     = var.ec2_subnet_id
 
   iam_instance_profile   = length(aws_iam_instance_profile.profile) > 0 ? aws_iam_instance_profile.profile[0].id : null
   vpc_security_group_ids = [aws_security_group.sg.id]
