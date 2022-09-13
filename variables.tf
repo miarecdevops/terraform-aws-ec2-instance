@@ -17,20 +17,31 @@ variable "tags" {
 
 # VPC settings
 variable "vpc_id" {
-  description = "Optional, vpc_id where Jenkins will be deployed, if null, jenkins will be deployed in default VPC"
+  description = "Optional, vpc_id where instance will be deployed, if null, instance will be deployed in default VPC"
   type        = string
   default     = null
 }
 
 variable "ec2_subnet_id" {
-  description = "Optional, a Subnet ID where Jenkins will be deployed, this has to be contained in the same VPC defined in vpc_id. If not provided, the first subnet will be selected in the VPC"
+  description = "Optional, a Subnet ID where Instance will be deployed, this has to be contained in the same VPC defined in vpc_id. If not provided, the first subnet will be selected in the VPC"
   type        = string
+  default     = null
+}
+
+variable "subnet_list" {
+  description = "Optional, List of Subnet ID with key Availability Zones, this is used when Multiple instances are deployen in multiple AZs"
+  default     = null
+}
+
+variable "availabilty_zones" {
+  description = "list of availability zones used to choose subnet when multiple instances are deployed "
+  type        = list
   default     = null
 }
 
 # Security Group settings
 variable "sg_rules" {
-  description = "Securtity group rules applied to jenkins instance"
+  description = "Securtity group rules applied to instance instance"
   type        = map(map(string))
   default     = {
     SSH = {
