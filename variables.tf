@@ -39,6 +39,12 @@ variable "availabilty_zones" {
   default     = null
 }
 
+variable "index" {
+  description = "index of instance being created when multiple instances are deployed "
+  type        = number
+  default     = null
+}
+
 # Security Group settings
 variable "sg_rules" {
   description = "Securtity group rules applied to instance instance"
