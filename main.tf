@@ -132,7 +132,7 @@ data "aws_route53_zone" "domain" {
 resource "aws_route53_record" "record" {
   count = var.route53_a_record != null ? 1 : 0
 
-  zone_id = var.route53_zone_id == null ? data.aws_route53_zone.domain[0].zone_id : var.route53_zone_id
+  zone_id = data.aws_route53_zone.domain[0].zone_id
   name    = "${var.route53_a_record}.${data.aws_route53_zone.domain[0].name}"
   type    = "A"
   ttl     = var.route53_ttl
