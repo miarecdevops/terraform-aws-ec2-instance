@@ -79,6 +79,7 @@ module "private" {
     count = 4
 
     # Networking Variables
+    vpc_id                = module.network.vpc_id
     index = count.index
     subnet_list = module.network.public_subnet_ids
     availabilty_zones = var.availability_zones
