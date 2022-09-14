@@ -35,7 +35,7 @@ variable "subnet_list" {
 }
 
 variable "availabilty_zones" {
-  description = "Optional, list of availability zones used to choose subnet when multiple instances are deployed "
+  description = "Optional, list of availability zones used to choose subnet when multiple instances are deployed"
   type        = list
   default     = null
 }
@@ -104,14 +104,20 @@ variable "user_data" {
 
 # Route53 settings
 variable "route53_a_record" {
-  description = "Optional, host portion of FQDN. If specified, the domain portion and zone_id parameters are required as well"
+  description = "Optional, host portion of FQDN. If specified, the route_53_zone parameters are required as well"
   type        = string
   default     = null
 }
 
-variable "route53_zone" {
+variable "route53_zone_name" {
   type        = string
-  description = "Optional, a Route53 Zone to build A record in"
+  description = "Optional, Route53 Zone Name to build A record in"
+  default     = null
+}
+
+variable "route53_zone_id" {
+  type        = string
+  description = "Optional, a Route53 Zone ID, this should be supplied if zone is being created as part of your terraform project"
   default     = null
 }
 
@@ -124,7 +130,6 @@ variable "route53_zone_private" {
 variable "route53_ttl" {
   type        = number
   description = "TTL of the DNS record, in seconds"
-  default     = 300
 }
 
 
