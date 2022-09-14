@@ -17,20 +17,38 @@ variable "tags" {
 
 # VPC settings
 variable "vpc_id" {
-  description = "Optional, vpc_id where Jenkins will be deployed, if null, jenkins will be deployed in default VPC"
+  description = "Optional, vpc_id where instance will be deployed, if null, instance will be deployed in default VPC"
   type        = string
   default     = null
 }
 
 variable "ec2_subnet_id" {
-  description = "Optional, a Subnet ID where Jenkins will be deployed, this has to be contained in the same VPC defined in vpc_id. If not provided, the first subnet will be selected in the VPC"
+  description = "Optional, a Subnet ID where Instance will be deployed, this has to be contained in the same VPC defined in vpc_id. If not provided, the first subnet will be selected in the VPC"
   type        = string
+  default     = null
+}
+
+# Multi Instance Vars
+variable "subnet_list" {
+  description = "Optional, List of Subnet ID with key Availability Zones, this is used when Multiple instances are deployen in multiple AZs"
+  default     = null
+}
+
+variable "availabilty_zones" {
+  description = "Optional, list of availability zones used to choose subnet when multiple instances are deployed"
+  type        = list
+  default     = null
+}
+
+variable "index" {
+  description = "Optional, Index of instance being created when multiple instances are deployed "
+  type        = number
   default     = null
 }
 
 # Security Group settings
 variable "sg_rules" {
-  description = "Securtity group rules applied to jenkins instance"
+  description = "Securtity group rules applied to instance instance"
   type        = map(map(string))
   default     = {
     SSH = {
@@ -86,14 +104,14 @@ variable "user_data" {
 
 # Route53 settings
 variable "route53_a_record" {
-  description = "Optional, host portion of FQDN. If specified, the domain portion and zone_id parameters are required as well"
+  description = "Optional, host portion of FQDN. If specified, the route_53_zone parameters are required as well"
   type        = string
   default     = null
 }
 
 variable "route53_zone" {
   type        = string
-  description = "Optional, a Route53 Zone to build A record in"
+  description = "Optional, Route53 Zone Name to build A record in"
   default     = null
 }
 
@@ -106,7 +124,7 @@ variable "route53_zone_private" {
 variable "route53_ttl" {
   type        = number
   description = "TTL of the DNS record, in seconds"
-  default     = 300
+  default     = null
 }
 
 

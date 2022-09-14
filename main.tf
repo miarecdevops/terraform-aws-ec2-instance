@@ -7,7 +7,8 @@ data "aws_vpc" "default" {
 }
 
 locals {
-  vpc_id = var.vpc_id != null ? var.vpc_id : data.aws_vpc.default.id 
+  vpc_id = var.vpc_id != null ? var.vpc_id : data.aws_vpc.default.id
+  subnet_id_per_az = var.subnet_list == null ? null : (var.index % 2 == 0 ? var.subnet_list[var.availabilty_zones[0]] : var.subnet_list[var.availabilty_zones[1]])
 }
 
 # --------------------------------------------
@@ -100,7 +101,7 @@ resource "aws_instance" "instance" {
   ami           = var.ec2_ami_id
   key_name      = var.ec2_ssh_key_name
   instance_type = var.ec2_instance_type
-  subnet_id     = var.ec2_subnet_id
+  subnet_id     = var.subnet_list == null ? var.ec2_subnet_id : local.subnet_id_per_az
 
   iam_instance_profile   = length(aws_iam_instance_profile.profile) > 0 ? aws_iam_instance_profile.profile[0].id : null
   vpc_security_group_ids = [aws_security_group.sg.id]
