@@ -93,7 +93,6 @@ module "private" {
 
     # DNS variables
     route53_zone          = aws_route53_zone.subdomain.name
-    route53_zone_id       = aws_route53_zone.subdomain.id
     route53_a_record      = "${var.public_route53_a_record}${count.index}"
     route53_ttl           = var.public_route53_ttl
     route53_zone_private  = false
