@@ -28,8 +28,7 @@ See [`variables.tf`](./variables.tf) for full list of variables
 - `ec2_subnet_id` (Optional) a Subnet ID where Instance will be deployed, this has to be contained in the same VPC defined in vpc_id. If not provided, the first subnet will be selected in the VPC
 
 - `route53_a_record`(Optional) Host portion of FQDN. If specified, the route_53_zone or  route53_zone_id parameters are required as well"
-- `route53_zone_name` (Optional) Route53 Zone name to build A record in
-- `route53_zone_id` (Optional) a Route53 Zone ID, this should be supplied if zone is being created as part of your terraform project, If zone is preexisting, than id will be looked up using `route53_zone`
+- `route53_zone` (Optional) Route53 Zone name to build A record in
 - `route53_ttl` (Optional) ttl of the DNS record, in seconds, public and private
 >  Multiple instance Variables
 - `index` (Optional) Index of instance being created when multiple instances are deployed

@@ -109,15 +109,9 @@ variable "route53_a_record" {
   default     = null
 }
 
-variable "route53_zone_name" {
+variable "route53_zone" {
   type        = string
   description = "Optional, Route53 Zone Name to build A record in"
-  default     = null
-}
-
-variable "route53_zone_id" {
-  type        = string
-  description = "Optional, a Route53 Zone ID, this should be supplied if zone is being created as part of your terraform project"
   default     = null
 }
 

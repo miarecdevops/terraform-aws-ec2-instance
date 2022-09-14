@@ -123,10 +123,9 @@ resource "aws_instance" "instance" {
 # -------------------------------------------
 # Create Route53 A record for Public resolution if in Public Subnet
 # -------------------------------------------
-# Lookup Zone ID if not specified
 data "aws_route53_zone" "domain" {
-  count        = var.route53_zone_id != null ? 1 : 0
-  name         = var.route53_zone_name
+  count        = var.route53_a_record != null ? 1 : 0
+  name         = var.route53_zone
   private_zone = var.route53_zone_private
 }
 
