@@ -124,7 +124,7 @@ variable "route53_zone_private" {
 variable "route53_ttl" {
   type        = number
   description = "TTL of the DNS record, in seconds"
-  default     = null
+  default     = 300
 }
 
 
