@@ -8,7 +8,7 @@ data "aws_vpc" "default" {
 
 locals {
   vpc_id = var.vpc_id != null ? var.vpc_id : data.aws_vpc.default.id
-  subnet_id_per_az = var.subnet_list == null ? null : (var.index % 2 == 0 ? var.subnet_list[var.availabilty_zones[0]] : var.subnet_list[var.availabilty_zones[1]])
+  subnet_id_per_az = var.subnet_list == null ? null : (var.index % 2 == 0 ? var.subnet_list[var.availability_zones[0]] : var.subnet_list[var.availability_zones[1]])
 }
 
 # --------------------------------------------

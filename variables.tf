@@ -34,7 +34,7 @@ variable "subnet_list" {
   default     = null
 }
 
-variable "availabilty_zones" {
+variable "availability_zones" {
   description = "Optional, list of availability zones used to choose subnet when multiple instances are deployed"
   type        = list
   default     = null
