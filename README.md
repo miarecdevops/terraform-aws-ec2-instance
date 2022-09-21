@@ -81,7 +81,7 @@ module "private" {
     vpc_id                = module.network.vpc_id
     index = count.index
     subnet_list = module.network.public_subnet_ids
-    availabilty_zones = var.availability_zones
+    availability_zones = var.availability_zones
 
     # required variables for module
     ec2_ssh_key_name      = var.ec2_ssh_key_name == null ? module.ssh[0].ec2_ssh_key_name : var.ec2_ssh_key_name
