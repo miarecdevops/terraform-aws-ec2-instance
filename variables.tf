@@ -96,6 +96,12 @@ variable "ec2_volume_size" {
   type        = number
 }
 
+variable "ec2_metadata" {
+  type        = bool
+  description = "Set to TRUE, instance metadata will be available via IMDSv1"
+  default     = true
+}
+
 variable "user_data" {
   description = "Optional, user_data.sh script to be loaded on ec2 creation"
   type        = any

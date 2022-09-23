@@ -23,6 +23,7 @@ See [`variables.tf`](./variables.tf) for full list of variables
 - `tags` Tags to set on all resources
 
 > Optional Variables
+- `ec2_metadata` (Optional) If set to TRUE, instance metadata will be available via IMDSv1, default = true
 - `user_data` (Optional) optional script to be ran on instance upon creation
 - `vpc_id` (Optional) vpc_id where instance will be deployed, if null, instance will be deployed in default VP
 - `ec2_subnet_id` (Optional) a Subnet ID where Instance will be deployed, this has to be contained in the same VPC defined in vpc_id. If not provided, the first subnet will be selected in the VPC

@@ -110,6 +110,12 @@ resource "aws_instance" "instance" {
     volume_size = var.ec2_volume_size
   }
 
+  metadata_options {
+    http_endpoint          = var.ec2_metadata == true ? "enabled": "disabled"
+    instance_metadata_tags = var.ec2_metadata == true ? "enabled": "disabled"
+  }
+
+
   user_data = var.user_data
 
   tags = merge(
