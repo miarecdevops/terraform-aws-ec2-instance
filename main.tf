@@ -135,6 +135,13 @@ data "aws_route53_zone" "domain" {
   private_zone = var.route53_zone_private
 }
 
+//this is required because of a limitation with terraform
+// in some cases if the instnace modified terraform will not
+// recognize this in its planning stage, this forces lookup of the data
+data "aws_instance" "instance" {
+  instance_id = aws_instance.instance.id
+}
+
 resource "aws_route53_record" "record" {
   count = var.route53_a_record != null ? 1 : 0
 
@@ -142,6 +149,5 @@ resource "aws_route53_record" "record" {
   name    = "${var.route53_a_record}.${data.aws_route53_zone.domain[0].name}"
   type    = "A"
   ttl     = var.route53_ttl
-  records = [var.route53_zone_private == true ? aws_instance.instance.private_ip : aws_instance.instance.public_ip]
+  records = [var.route53_zone_private == true ? data.aws_instance.instance.private_ip : data.aws_instance.instance.public_ip]
 }
-
