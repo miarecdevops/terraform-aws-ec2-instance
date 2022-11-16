@@ -15,6 +15,37 @@ variable "tags" {
   default     = {}
 }
 
+# AMI settings
+variable "ec2_ami_id" {
+  description = "(Optional) AMI ID. supply an AMI ID to use a specific Image.   Caution! It is unique for each region"
+  type        = string
+  default     = null
+}
+
+variable "ec2_ami_os" {
+  description = "OS that will be used for EC2, `centos` = CentOS 7, `ubuntu` = Ubuntu 20.04"
+  type        = string
+  default     = "centos"
+}
+
+variable "ec2_ami_virtualization" {
+  description = "(Optional) AMI Virtualization type, default = `hvm`"
+  type        = string
+  default     = "hvm"
+}
+
+variable "ec2_ami_archtecture" {
+  description = "(Optional) AMI archetecture type, default = `x86_64`"
+  type        = string
+  default     = "x86_64"
+}
+
+variable "ec2_ami_image-type" {
+  description = "(Optional) AMI image type, default = `machine`"
+  type        = string
+  default     = "machine"
+}
+
 # VPC settings
 variable "vpc_id" {
   description = "Optional, vpc_id where instance will be deployed, if null, instance will be deployed in default VPC"
@@ -76,11 +107,6 @@ variable "iam_policies" {
 }
 
 # EC2 instance settings
-variable "ec2_ami_id" {
-  description = "AMI ID. Caution! It is unique for each region"
-  type        = string
-}
-
 variable "ec2_ssh_key_name" {
   description = "SSH Key Pair Name. Such key must exist in EC2 console in the region"
   type        = string
