@@ -1,4 +1,44 @@
 // --------------------------------------------
+// AMI lookup
+// --------------------------------------------
+
+data "aws_ami" "ami" {
+  most_recent = true
+  owners      = [
+    (
+      var.ec2_ami_os == "centos" ?
+      "125523088429" :   # Community Platform Engineering (https://wiki.centos.org/Cloud/AWS)
+      "099720109477"     # Canonical
+    )
+  ]
+
+  filter {
+    name   = "virtualization-type"
+    values = [var.ec2_ami_virtualization]
+  }
+
+  filter {
+    name   = "architecture"
+    values = [var.ec2_ami_archtecture]
+  }
+
+  filter {
+    name   = "image-type"
+    values = [var.ec2_ami_image-type]
+  }
+
+  filter {
+    name   = "name"
+    values = [(
+      var.ec2_ami_os == "centos" ?
+      "CentOS Linux 7*" :
+      "ubuntu/images/hvm-ssd/ubuntu-focal-20.04-amd64-server-*"
+    )]
+  }
+}
+
+
+// --------------------------------------------
 // Network
 // --------------------------------------------
 
@@ -98,7 +138,7 @@ resource "aws_security_group_rule" "rule" {
 # Build EC2 Instance
 # -------------------------------------------
 resource "aws_instance" "instance" {
-  ami           = var.ec2_ami_id
+  ami           = var.ec2_ami_id == null ? data.aws_ami.ami.id : var.ec2_ami_id
   key_name      = var.ec2_ssh_key_name
   instance_type = var.ec2_instance_type
   subnet_id     = var.subnet_list == null ? var.ec2_subnet_id : local.subnet_id_per_az

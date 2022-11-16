@@ -15,7 +15,7 @@ See [`variables.tf`](./variables.tf) for full list of variables
 - `ec2_ssh_key_name` SSH Key Pair Name. Such key must exist in EC2 console
 - `sg_rules` map of rules that will be applied to instance security group
 - `iam_policy` map of IAM roles that will be applied to instance
-- `ec2_ami_id` AMI ID. Caution! It is unique for each region
+
 - `ec2_instance_type` ec2 instance type
 - `ec2_volume_size` Disk size in GB
 - `environment` Name of environment (all tags will start with this name)
@@ -23,6 +23,7 @@ See [`variables.tf`](./variables.tf) for full list of variables
 - `tags` Tags to set on all resources
 
 > Optional Variables
+
 - `ec2_metadata` (Optional) If set to TRUE, instance metadata will be available via IMDSv1, default = true
 - `user_data` (Optional) optional script to be ran on instance upon creation
 - `vpc_id` (Optional) vpc_id where instance will be deployed, if null, instance will be deployed in default VP
@@ -36,9 +37,25 @@ See [`variables.tf`](./variables.tf) for full list of variables
 - `subnet_list` (Optional) List of Subnet IDs with key Availability Zones, this is used when Multiple instances are deployen in multiple AZs
 - `availabilty_zones`(Optional) list of availability zones used to choose subnet when multiple instances are deployed
 
+> AMI Lookup
+
+This module has the ability to lookup the latest AMI based a few criteria, this is useful for quick deployment
+
+- `ec2_ami_os` OS that will be used for EC2, currently CentOS7 and Ubuntu 20.04 are supported, default = `centos`
+    - `centos` = CentOS 7
+    - `ubuntu` = Ubuntu 20.04
+- `ec2_ami_virtualization` (Optional) AMI Virtualization type, default = `hvm`
+- `ec2_ami_archtecture` (Optional) AMI archetecture type, default = `x86_64`
+- `ec2_ami_image-type` (Optional) AMI image type, default = `machine`
+
+> Specific AMI use
+
+As an alternative an AMI ID can be passed to the module in the event that a specific Image is needed
+- `ec2_ami_id` AMI ID. supply an AMI ID to use a specific Image. Caution! It is unique for each region
+
 ## Sample Module Calls
 
-> Single Private Only Instance, existing VPC, No DNS Config, access to S3 bucket
+> Single Private Only Instance, existing VPC, No DNS Config, access to S3 bucket, lookup latest CentOS7 AMI
 
 ```hcl
 module "private" {
@@ -57,7 +74,8 @@ module "private" {
                                   effect   = "Allow"
                                   resource = "*"
                               }
-    ec2_ami_id            = var.private_ec2_ami_id
+
+    ec2_ami_os            = "centos"
     ec2_instance_type     = var.private_ec2_instance_type
     ec2_volume_size       = var.private_ec2_volume_size
 
@@ -71,7 +89,7 @@ module "private" {
 }
 ```
 
-> Multiple Public instances, existing VPC, with DNS
+> Multiple Public instances, existing VPC, with DNS, using a specific AMI
 
 ```hcl
 module "private" {
@@ -88,7 +106,8 @@ module "private" {
     ec2_ssh_key_name      = var.ec2_ssh_key_name == null ? module.ssh[0].ec2_ssh_key_name : var.ec2_ssh_key_name
     sg_rules              = var.public_sg_rules
     iam_policies          = var.public_iam_policies
-    ec2_ami_id            = var.public_ec2_ami_id
+
+    ec2_ami_id            = "ami-070237a0a64c58642"
     ec2_instance_type     = var.public_ec2_instance_type
     ec2_volume_size       = var.public_ec2_volume_size
 
