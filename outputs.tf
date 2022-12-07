@@ -7,7 +7,7 @@ output "private_ip" {
 }
 
 output "public_ip" {
-    value = aws_instance.instance.public_ip
+    value = var.ec2_assign_eip == true ? aws_eip.eip[0].public_ip : aws_instance.instance.public_ip
 }
 
 output "fqdn" {

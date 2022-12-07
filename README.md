@@ -28,6 +28,7 @@ See [`variables.tf`](./variables.tf) for full list of variables
 - `user_data` (Optional) optional script to be ran on instance upon creation
 - `vpc_id` (Optional) vpc_id where instance will be deployed, if null, instance will be deployed in default VP
 - `ec2_subnet_id` (Optional) a Subnet ID where Instance will be deployed, this has to be contained in the same VPC defined in vpc_id. If not provided, the first subnet will be selected in the VPC
+- `ec2_assign_eip` (Optional) When true, a Static Pubilic (ElP) will be assigned to the Ec2 instance
 
 - `route53_a_record`(Optional) Host portion of FQDN. If specified, the route_53_zone or  route53_zone_id parameters are required as well"
 - `route53_zone` (Optional) Route53 Zone name to build A record in
@@ -92,7 +93,7 @@ module "private" {
 > Multiple Public instances, existing VPC, with DNS, using a specific AMI
 
 ```hcl
-module "private" {
+module "public" {
     source = "github.com/miarecdevops/terraform-aws-ec2-instance.git"
     count = 4
 
@@ -101,6 +102,7 @@ module "private" {
     index = count.index
     subnet_list = module.network.public_subnet_ids
     availability_zones = var.availability_zones
+    ec2_assign_eip  = true
 
     # required variables for module
     ec2_ssh_key_name      = var.ec2_ssh_key_name == null ? module.ssh[0].ec2_ssh_key_name : var.ec2_ssh_key_name

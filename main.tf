@@ -167,6 +167,16 @@ resource "aws_instance" "instance" {
 }
 
 # -------------------------------------------
+# Create a static IP address
+# -------------------------------------------
+
+resource "aws_eip" "eip" {
+  count = var.ec2_assign_eip == true ? 1 : 0
+  instance = aws_instance.instance.id
+  vpc      = true
+}
+
+# -------------------------------------------
 # Create Route53 A record for Public resolution if in Public Subnet
 # -------------------------------------------
 data "aws_route53_zone" "domain" {
@@ -189,5 +199,10 @@ resource "aws_route53_record" "record" {
   name    = "${var.route53_a_record}.${data.aws_route53_zone.domain[0].name}"
   type    = "A"
   ttl     = var.route53_ttl
-  records = [var.route53_zone_private == true ? data.aws_instance.instance.private_ip : data.aws_instance.instance.public_ip]
+  records = [var.route53_zone_private == true ?
+             data.aws_instance.instance.private_ip :
+             var.ec2_assign_eip == true ?
+                aws_eip.eip[0].public_ip :
+                aws_instance.instance.public_ip
+             ]
 }

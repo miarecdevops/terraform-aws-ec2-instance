@@ -46,7 +46,7 @@ variable "ec2_ami_image-type" {
   default     = "machine"
 }
 
-# VPC settings
+# VPC / Network settings
 variable "vpc_id" {
   description = "Optional, vpc_id where instance will be deployed, if null, instance will be deployed in default VPC"
   type        = string
@@ -57,6 +57,12 @@ variable "ec2_subnet_id" {
   description = "Optional, a Subnet ID where Instance will be deployed, this has to be contained in the same VPC defined in vpc_id. If not provided, the first subnet will be selected in the VPC"
   type        = string
   default     = null
+}
+
+variable "ec2_assign_eip" {
+  description = "if true, Static Public IP address will be assigned to ec2 instance"
+  type        = bool
+  default     = false
 }
 
 # Multi Instance Vars
