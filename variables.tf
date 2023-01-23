@@ -108,7 +108,7 @@ variable "sg_rules" {
 # IAM settings
 variable "iam_policies" {
   description =  "Optional, IAM policies that will be attahed to IAM Role"
-  type = map(object)
+  type = map(object({Action=any, Effect=string, Resource=string}))
   default = { }
 }
 
