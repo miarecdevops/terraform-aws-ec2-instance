@@ -27,10 +27,14 @@ module "instance" {
   ec2_volume_size   = 8
 
   iam_policies = {
-    describe_instances = {
+    describe_instances = jsonencode({
+      Version = "2012-10-17"
+      Statement = [{
         Action   = "ec2:DescribeInstances"
         Effect   = "Allow"
         Resource = "*"
-    }
+      }
+	  ]
+    })
   }
 }

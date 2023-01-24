@@ -85,16 +85,7 @@ resource "aws_iam_role_policy" "policy" {
   name = "${var.environment}-${var.role}-${each.key}-policy"
   role = aws_iam_role.role[0].id
 
-  policy = jsonencode({
-    Version = "2012-10-17"
-    Statement = [
-      {
-        Action   = each.value.Action
-        Effect   = each.value.Effect
-        Resource = each.value.Resource
-      },
-    ]
-  })
+  policy = each.value
 }
 
 resource "aws_iam_instance_profile" "profile" {
