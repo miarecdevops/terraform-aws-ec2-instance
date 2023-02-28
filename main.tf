@@ -186,8 +186,12 @@ data "aws_instance" "instance" {
 resource "aws_route53_record" "record" {
   count = var.route53_a_record != null ? 1 : 0
 
+  name = (
+    var.route53_a_record == "@" ?
+    data.aws_route53_zone.domain[0].name :
+    "${var.route53_a_record}.${data.aws_route53_zone.domain[0].name}"
+  )
   zone_id = data.aws_route53_zone.domain[0].zone_id
-  name    = "${var.route53_a_record}.${data.aws_route53_zone.domain[0].name}"
   type    = "A"
   ttl     = var.route53_ttl
   records = [var.route53_zone_private == true ?
