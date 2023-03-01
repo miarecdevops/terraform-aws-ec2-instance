@@ -17,3 +17,8 @@ output "fqdn" {
 output "iam_role" {
     value = length(aws_iam_role.role) > 0 ? aws_iam_role.role[0].arn : null
 }
+
+output "az" {
+    value = aws_instance.instance.availability_zone
+
+}

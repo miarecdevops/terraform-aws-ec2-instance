@@ -140,3 +140,4 @@ all ouputs are accessible module.module_name.output_name
 - `fqdn` Publicly resolvable FQDN
 - `private_fqdn` privately resolvable FQDN
 - `iam_role` iam role arn
+- `az` Availablity zone instance is deployed in
