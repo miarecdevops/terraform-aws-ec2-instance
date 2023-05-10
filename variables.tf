@@ -22,12 +22,6 @@ variable "ec2_ami_id" {
   default     = null
 }
 
-# variable "ec2_ami_os" {
-#   description = "OS that will be used for EC2, `centos` = CentOS 7, `ubuntu` = Ubuntu 20.04"
-#   type        = string
-#   default     = "centos"
-# }
-
 variable "ec2_ami_virtualization" {
   description = "(Optional) AMI Virtualization type, default = `hvm`"
   type        = string
@@ -47,12 +41,9 @@ variable "ec2_ami_image-type" {
 }
 
 
-
-
 variable "ec2_ami_os" {
   description = "OS distribution that will be used for EC2, `centos` or `ubuntu`"
   type        = string
-  # default     = null
   default     = "centos"
 }
 

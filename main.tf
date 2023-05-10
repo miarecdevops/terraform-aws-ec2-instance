@@ -2,50 +2,6 @@
 // AMI lookup
 // --------------------------------------------
 
-# data "aws_ami" "ami" {
-#   most_recent = true
-#   owners      = [
-#     (
-#       var.ec2_ami_os == "centos" ?
-#       "125523088429" :   # Community Platform Engineering (https://wiki.centos.org/Cloud/AWS)
-#       "099720109477"     # Canonical
-#     )
-#   ]
-
-#   filter {
-#     name   = "virtualization-type"
-#     values = [var.ec2_ami_virtualization]
-#   }
-
-#   filter {
-#     name   = "architecture"
-#     values = [var.ec2_ami_archtecture]
-#   }
-
-#   filter {
-#     name   = "image-type"
-#     values = [var.ec2_ami_image-type]
-#   }
-
-#   filter {
-#     name   = "name"
-#     values = [(
-#       var.ec2_ami_os == "centos" ?
-#       "CentOS Linux 7*" :
-#       "ubuntu/images/hvm-ssd/ubuntu-focal-20.04-amd64-server-*"
-#     )]
-#   }
-# }
-
-
-# locals {
-#   ubuntu_name =
-
-#   ami_name = ec2_ami_os_distribution == "centos" ?
-#     "CentOS Linux 7*" :
-#     "ubuntu/images/hvm-ssd/ubuntu-${ec2_ami_os_ubuntu_release}-amd64-server-*"
-# }
-
 data "aws_ami" "ami" {
   most_recent = true
   owners      = [
