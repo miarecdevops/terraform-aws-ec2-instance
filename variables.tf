@@ -49,7 +49,7 @@ variable "ec2_ami_image-type" {
 
 
 
-variable "ec2_ami_os_distribution" {
+variable "ec2_ami_os" {
   description = "OS distribution that will be used for EC2, `centos` or `ubuntu`"
   type        = string
   # default     = null
