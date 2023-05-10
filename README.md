@@ -42,9 +42,10 @@ See [`variables.tf`](./variables.tf) for full list of variables
 
 This module has the ability to lookup the latest AMI based a few criteria, this is useful for quick deployment
 
-- `ec2_ami_os` OS that will be used for EC2, currently CentOS7 and Ubuntu 20.04 are supported, default = `centos`
+- `ec2_ami_os` OS that will be used for EC2, currently CentOS7 and Ubuntu are supported, default = `centos`
     - `centos` = CentOS 7
-    - `ubuntu` = Ubuntu 20.04
+    - `ubuntu` = Ubuntu
+- `ec2_ami_os_release` (Optional) Release of Ubuntu,   default = `20.04`
 - `ec2_ami_virtualization` (Optional) AMI Virtualization type, default = `hvm`
 - `ec2_ami_archtecture` (Optional) AMI archetecture type, default = `x86_64`
 - `ec2_ami_image-type` (Optional) AMI image type, default = `machine`
@@ -56,7 +57,7 @@ As an alternative an AMI ID can be passed to the module in the event that a spec
 
 ## Sample Module Calls
 
-> Single Private Only Instance, existing VPC, No DNS Config, access to S3 bucket, lookup latest CentOS7 AMI
+> Single Private Only Instance, existing VPC, No DNS Config, access to S3 bucket, lookup latest Ubuntu 22.04 AMI
 
 ```hcl
 module "private" {
@@ -76,7 +77,8 @@ module "private" {
                                   resource = "*"
                               }
 
-    ec2_ami_os            = "centos"
+    ec2_ami_os            = "ubuntu"
+    ec2_ami_os_release    = "22.04"
     ec2_instance_type     = var.private_ec2_instance_type
     ec2_volume_size       = var.private_ec2_volume_size
 
