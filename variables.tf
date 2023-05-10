@@ -22,12 +22,6 @@ variable "ec2_ami_id" {
   default     = null
 }
 
-variable "ec2_ami_os" {
-  description = "OS that will be used for EC2, `centos` = CentOS 7, `ubuntu` = Ubuntu 20.04"
-  type        = string
-  default     = "centos"
-}
-
 variable "ec2_ami_virtualization" {
   description = "(Optional) AMI Virtualization type, default = `hvm`"
   type        = string
@@ -45,6 +39,20 @@ variable "ec2_ami_image-type" {
   type        = string
   default     = "machine"
 }
+
+
+variable "ec2_ami_os" {
+  description = "OS distribution that will be used for EC2, `centos` or `ubuntu`"
+  type        = string
+  default     = "centos"
+}
+
+variable "ec2_ami_os_release" {
+  description = "Distributiuon Release version, if ec2_ami_os = ubuntu , value should be `20.04` or `22.04`"
+  type        = string
+  default     = "20.04"
+}
+
 
 # VPC / Network settings
 variable "vpc_id" {
