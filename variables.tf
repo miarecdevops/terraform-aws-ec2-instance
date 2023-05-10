@@ -56,10 +56,10 @@ variable "ec2_ami_os" {
   default     = "centos"
 }
 
-variable "ec2_ami_os_ubuntu_release" {
-  description = "Ubuntu version, if ec2_ami_os_distribution = ubuntu , options: `jammy-22.04`, `focal-20.04`,   "
+variable "ec2_ami_os_release" {
+  description = "Distributiuon Release version, if ec2_ami_os = ubuntu , value should be `20.04` or `22.04`"
   type        = string
-  default     = "focal-20.04"
+  default     = "20.04"
 }
 
 

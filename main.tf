@@ -76,7 +76,7 @@ data "aws_ami" "ami" {
     values = [(
       var.ec2_ami_os == "centos" ?
       "CentOS Linux 7*" :
-      "ubuntu/images/hvm-ssd/ubuntu-${var.ec2_ami_os_ubuntu_release}-amd64-server-*"
+      "ubuntu/images/hvm-ssd/ubuntu-*-${var.ec2_ami_os_release}-amd64-server-*"
     )]
   }
 }
