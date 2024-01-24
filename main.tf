@@ -149,6 +149,10 @@ resource "aws_instance" "instance" {
 
   user_data = var.user_data
 
+  lifecycle {
+    ignore_changes = [ami]    # prevents re-creation of instance if AMI changes due to update in AWS registry
+  }
+
   tags = merge(
     var.tags,
     {
