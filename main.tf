@@ -157,7 +157,6 @@ resource "aws_instance" "instance" {
   )
 
   lifecycle {
-    prevent_destroy = var.ec2_prevent_destroy
     ignore_changes = [ ami ]
   }
 

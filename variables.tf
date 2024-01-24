@@ -141,12 +141,6 @@ variable "ec2_metadata" {
   default     = true
 }
 
-variable "ec2_prevent_destroy" {
-  description = "When true, resource aws_instance.instance will not be able to be destroyed"
-  type        = bool
-  default     = true
-}
-
 variable "user_data" {
   description = "Optional, user_data.sh script to be loaded on ec2 creation"
   type        = any
