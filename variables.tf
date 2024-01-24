@@ -53,6 +53,11 @@ variable "ec2_ami_os_release" {
   default     = "20.04"
 }
 
+variable "ec2_prevent_destroy" {
+  description = "When true, resource aws_instance.instance will not be able to be destroyed"
+  type        = bool
+  default     = true
+}
 
 # VPC / Network settings
 variable "vpc_id" {
