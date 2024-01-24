@@ -53,12 +53,6 @@ variable "ec2_ami_os_release" {
   default     = "20.04"
 }
 
-variable "ec2_prevent_destroy" {
-  description = "When true, resource aws_instance.instance will not be able to be destroyed"
-  type        = bool
-  default     = true
-}
-
 # VPC / Network settings
 variable "vpc_id" {
   description = "Optional, vpc_id where instance will be deployed, if null, instance will be deployed in default VPC"
@@ -144,6 +138,12 @@ variable "ec2_volume_size" {
 variable "ec2_metadata" {
   type        = bool
   description = "Set to TRUE, instance metadata will be available via IMDSv1"
+  default     = true
+}
+
+variable "ec2_prevent_destroy" {
+  description = "When true, resource aws_instance.instance will not be able to be destroyed"
+  type        = bool
   default     = true
 }
 
