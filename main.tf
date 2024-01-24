@@ -155,6 +155,11 @@ resource "aws_instance" "instance" {
      Name = "${var.environment}-${var.role}"
     },
   )
+
+  lifecycle {
+    ignore_changes = [ ami ]
+  }
+
 }
 
 # -------------------------------------------
