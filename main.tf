@@ -2,15 +2,35 @@
 // AMI lookup
 // --------------------------------------------
 
+locals {
+  ami_owner = {
+    centos = "125523088429", # Community Platform Engineering (https://wiki.centos.org/Cloud/AWS)
+    ubuntu = "099720109477", # Canonical
+    rocky  = "792107900819"  # RockyLinux
+  }
+
+  ami_name = {
+    centos = "CentOS Linux 7*"
+    ubuntu = "ubuntu/images/hvm-ssd/ubuntu-*-${var.ec2_ami_os_release}-amd64-server-*"
+    rocky  = "Rocky-${var.ec2_ami_os_release}-*"
+  }
+
+  # selected_owner = var.ec2_ami_os == "centos" ? "125523088429" : null
+  #                  var.ec2_ami_os == "ubuntu" ? "099720109477" : null
+  #                  var.ec2_ami_os == "rocky"  ? "792107900819" : null
+}
+
 data "aws_ami" "ami" {
   most_recent = true
-  owners      = [
-    (
-      var.ec2_ami_os == "centos" ?
-      "125523088429" :   # Community Platform Engineering (https://wiki.centos.org/Cloud/AWS)
-      "099720109477"     # Canonical
-    )
-  ]
+  # owners      = [local.selected_owner]
+  owners      = lookup(local.ami_owner, var.ec2_ami_os, "099720109477")
+  # owners      = [
+  #   (
+  #     var.ec2_ami_os == "centos" ?
+  #     "125523088429" :   # Community Platform Engineering (https://wiki.centos.org/Cloud/AWS)
+  #     "099720109477"     # Canonical
+  #   )
+  # ]
 
   filter {
     name   = "virtualization-type"
@@ -29,11 +49,12 @@ data "aws_ami" "ami" {
 
   filter {
     name   = "name"
-    values = [(
-      var.ec2_ami_os == "centos" ?
-      "CentOS Linux 7*" :
-      "ubuntu/images/hvm-ssd/ubuntu-*-${var.ec2_ami_os_release}-amd64-server-*"
-    )]
+    values = lookup(local.ami_name, var.ec2_ami_os, "ubuntu/images/hvm-ssd/ubuntu-*-${var.ec2_ami_os_release}-amd64-server-*")
+    # values = [(
+    #   var.ec2_ami_os == "centos" ?
+    #   "CentOS Linux 7*" :
+    #   "ubuntu/images/hvm-ssd/ubuntu-*-${var.ec2_ami_os_release}-amd64-server-*"
+    # )]
   }
 }
 
