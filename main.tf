@@ -23,7 +23,7 @@ locals {
 data "aws_ami" "ami" {
   most_recent = true
   # owners      = [local.selected_owner]
-  owners      = lookup(local.ami_owner, var.ec2_ami_os, "099720109477")
+  owners      = [lookup(local.ami_owner, var.ec2_ami_os, "099720109477")]
   # owners      = [
   #   (
   #     var.ec2_ami_os == "centos" ?
@@ -49,7 +49,7 @@ data "aws_ami" "ami" {
 
   filter {
     name   = "name"
-    values = lookup(local.ami_name, var.ec2_ami_os, "ubuntu/images/hvm-ssd/ubuntu-*-${var.ec2_ami_os_release}-amd64-server-*")
+    values = [lookup(local.ami_name, var.ec2_ami_os, "ubuntu/images/hvm-ssd/ubuntu-*-${var.ec2_ami_os_release}-amd64-server-*")]
     # values = [(
     #   var.ec2_ami_os == "centos" ?
     #   "CentOS Linux 7*" :
