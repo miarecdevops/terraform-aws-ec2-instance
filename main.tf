@@ -11,7 +11,7 @@ locals {
 
   ami_name = {
     centos = "CentOS Linux 7*"
-    ubuntu = "ubuntu/images/hvm-ssd/ubuntu-*-${var.ec2_ami_os_release}-amd64-server-*"
+    ubuntu = "ubuntu/images/hvm-ssd*/ubuntu-*-${var.ec2_ami_os_release}-amd64-server-*"
     rocky  = "Rocky-${var.ec2_ami_os_release}-*"
   }
 
