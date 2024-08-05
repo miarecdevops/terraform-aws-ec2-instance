@@ -73,6 +73,12 @@ variable "ec2_assign_eip" {
   default     = false
 }
 
+variable "ec2_secondary_private_ips" {
+  description = "Optional, list of private ipv4 addresses that will be assiged to the instance"
+  type        = list
+  default     = null
+}
+
 # Multi Instance Vars
 variable "subnet_list" {
   description = "Optional, List of Subnet ID with key Availability Zones, this is used when Multiple instances are deployen in multiple AZs"
