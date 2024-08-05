@@ -139,6 +139,8 @@ resource "aws_instance" "instance" {
   instance_type = var.ec2_instance_type
   subnet_id     = var.subnet_list == null ? var.ec2_subnet_id : local.subnet_id_per_az
 
+  secondary_private_ips = var.ec2_secondary_private_ips
+
   iam_instance_profile   = length(aws_iam_instance_profile.profile) > 0 ? aws_iam_instance_profile.profile[0].id : null
   vpc_security_group_ids = [aws_security_group.sg.id]
 
