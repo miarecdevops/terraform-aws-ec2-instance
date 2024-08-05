@@ -172,7 +172,7 @@ resource "aws_instance" "instance" {
 # Create a static IP address
 # -------------------------------------------
 
-resource "aws_eip" "primary_eip" {
+resource "aws_eip" "eip" {
   count = var.ec2_assign_eip == true ? 1 : 0
   instance = aws_instance.instance.id
 }
