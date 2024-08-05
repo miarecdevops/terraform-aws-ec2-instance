@@ -139,7 +139,7 @@ resource "aws_instance" "instance" {
   instance_type = var.ec2_instance_type
   subnet_id     = var.subnet_list == null ? var.ec2_subnet_id : local.subnet_id_per_az
 
-  secondary_private_ips = var.ec2_secondary_private_ips
+  secondary_private_ips = var.ec2_secondary_private_ip == null ? null : [var.ec2_secondary_private_ip]
 
   iam_instance_profile   = length(aws_iam_instance_profile.profile) > 0 ? aws_iam_instance_profile.profile[0].id : null
   vpc_security_group_ids = [aws_security_group.sg.id]
@@ -172,10 +172,15 @@ resource "aws_instance" "instance" {
 # Create a static IP address
 # -------------------------------------------
 
-resource "aws_eip" "eip" {
+resource "aws_eip" "primary_eip" {
   count = var.ec2_assign_eip == true ? 1 : 0
   instance = aws_instance.instance.id
-  vpc      = true
+}
+
+resource "aws_eip" "secondary_eip" {
+  count = var.ec2_assign_secondary_eip == true ? 1 : 0
+  instance = aws_instance.instance.id
+  associate_with_private_ip = var.ec2_secondary_private_ip
 }
 
 # -------------------------------------------

@@ -7,7 +7,11 @@ output "private_ip" {
 }
 
 output "public_ip" {
-    value = var.ec2_assign_eip == true ? aws_eip.eip[0].public_ip : aws_instance.instance.public_ip
+    value = var.ec2_assign_eip == true ? aws_eip.primary_eip[0].public_ip : aws_instance.instance.public_ip
+}
+
+output "secondary_public_ip" {
+    value = var.ec2_assign_secondary_eip == true ? aws_eip.secondary_eip[0].public_ip : "n/a"
 }
 
 output "fqdn" {

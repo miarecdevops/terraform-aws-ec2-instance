@@ -73,11 +73,18 @@ variable "ec2_assign_eip" {
   default     = false
 }
 
-variable "ec2_secondary_private_ips" {
-  description = "Optional, list of private ipv4 addresses that will be assiged to the instance"
-  type        = list
+variable "ec2_secondary_private_ip" {
+  description = "Optional, private ipv4 address that will be assiged to the instance"
+  type        = string
   default     = null
 }
+
+variable "ec2_assign_secondary_eip" {
+  description = "if true, Static Public IP address will be assigned to the secondary IP address defined in `ec2_secondary_private_ip`"
+  type        = bool
+  default     = false
+}
+
 
 # Multi Instance Vars
 variable "subnet_list" {
