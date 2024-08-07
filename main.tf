@@ -177,8 +177,9 @@ resource "aws_eip" "eip" {
   instance = aws_instance.instance.id
 }
 
+# Create EIP for secondary IP address if it exists and if requested
 resource "aws_eip" "secondary_eip" {
-  count = var.ec2_assign_secondary_eip == true ? 1 : 0
+  count = var.ec2_secondary_private_ip != null && var.ec2_assign_secondary_eip == true ? 1 : 0
   instance = aws_instance.instance.id
   associate_with_private_ip = var.ec2_secondary_private_ip
 }
