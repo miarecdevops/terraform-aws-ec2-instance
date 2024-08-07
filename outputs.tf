@@ -2,6 +2,10 @@ output "instance_id" {
   value = aws_instance.instance.id
 }
 
+output "instance_tags" {
+  value = aws_instance.instance.tags
+}
+
 output "private_ip" {
     value = aws_instance.instance.private_ip
 }
@@ -24,5 +28,4 @@ output "iam_role" {
 
 output "az" {
     value = aws_instance.instance.availability_zone
-
 }

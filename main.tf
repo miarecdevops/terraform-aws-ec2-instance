@@ -113,7 +113,7 @@ resource "aws_security_group" "sg" {
   tags = merge(
     var.tags,
     {
-     Name = "${var.environment}-${var.role}-security_group"
+      Name = "${var.environment}-${var.role}-security_group"
     },
   )
  }
@@ -163,7 +163,8 @@ resource "aws_instance" "instance" {
   tags = merge(
     var.tags,
     {
-     Name = "${var.environment}-${var.role}"
+      Role = var.role
+      Name = "${var.environment}-${var.role}"
     },
   )
 }
