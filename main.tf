@@ -53,7 +53,6 @@ data "aws_vpc" "default" {
 
 locals {
   vpc_id = var.vpc_id != null ? var.vpc_id : data.aws_vpc.default.id
-  subnet_id_per_az = var.subnet_list == null ? null : (var.index % 2 == 0 ? var.subnet_list[var.availability_zones[0]] : var.subnet_list[var.availability_zones[1]])
 }
 
 # --------------------------------------------
@@ -137,7 +136,7 @@ resource "aws_instance" "instance" {
   ami           = var.ec2_ami_id == null ? data.aws_ami.ami.id : var.ec2_ami_id
   key_name      = var.ec2_ssh_key_name
   instance_type = var.ec2_instance_type
-  subnet_id     = var.subnet_list == null ? var.ec2_subnet_id : local.subnet_id_per_az
+  subnet_id     = var.ec2_subnet_id
 
   secondary_private_ips = var.ec2_secondary_private_ip == null ? null : [var.ec2_secondary_private_ip]
 

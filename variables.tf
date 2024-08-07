@@ -86,24 +86,6 @@ variable "ec2_assign_secondary_eip" {
 }
 
 
-# Multi Instance Vars
-variable "subnet_list" {
-  description = "Optional, List of Subnet ID with key Availability Zones, this is used when Multiple instances are deployen in multiple AZs"
-  default     = null
-}
-
-variable "availability_zones" {
-  description = "Optional, list of availability zones used to choose subnet when multiple instances are deployed"
-  type        = list
-  default     = null
-}
-
-variable "index" {
-  description = "Optional, Index of instance being created when multiple instances are deployed "
-  type        = number
-  default     = null
-}
-
 # Security Group settings
 variable "sg_rules" {
   description = "Securtity group rules applied to instance instance"

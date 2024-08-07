@@ -34,9 +34,6 @@ See [`variables.tf`](./variables.tf) for full list of variables
 - `route53_zone` (Optional) Route53 Zone name to build A record in
 - `route53_ttl` (Optional) ttl of the DNS record, in seconds, public and private
 >  Multiple instance Variables
-- `index` (Optional) Index of instance being created when multiple instances are deployed
-- `subnet_list` (Optional) List of Subnet IDs with key Availability Zones, this is used when Multiple instances are deployen in multiple AZs
-- `availabilty_zones`(Optional) list of availability zones used to choose subnet when multiple instances are deployed
 
 > AMI Lookup
 
@@ -102,8 +99,6 @@ module "public" {
     # Networking Variables
     vpc_id                = module.network.vpc_id
     index = count.index
-    subnet_list = module.network.public_subnet_ids
-    availability_zones = var.availability_zones
     ec2_assign_eip  = true
 
     # required variables for module
