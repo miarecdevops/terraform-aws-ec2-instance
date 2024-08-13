@@ -14,8 +14,10 @@ output "public_ip" {
     value = var.ec2_assign_eip == true ? aws_eip.eip[0].public_ip : aws_instance.instance.public_ip
 }
 
+# Secondary IP output is a set, AWS allows multiple secondary IP to be assigned, out role does not
+# output is converting set to list, then pulling first entry
 output "secondary_private_ip" {
-    value = var.ec2_secondary_private_ip == null ? null : aws_instance.instance.secondary_private_ips
+    value = var.ec2_secondary_private_ip == null ? null : tolist(aws_instance.instance.secondary_private_ips)[0]
 }
 
 output "secondary_public_ip" {
