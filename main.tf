@@ -75,12 +75,7 @@ resource "aws_iam_role" "role" {
     ]
   })
 
-  tags = merge(
-    var.tags,
-    {
-     Name = "${var.environment}-${var.role}-iam_policy"
-    },
-  )
+  tags = var.tags
 }
 
 # Create IAM Role Policies and attach to IAM Role
@@ -99,9 +94,12 @@ resource "aws_iam_instance_profile" "profile" {
 }
 
 # -------------------------------------------
-# Create Security Group and Rules
+# Create Security Group and Rules.
+# Note, a Security Group and Rules are created only 
+# when vpc_security_group_ids is not provided explicitely.
 # -------------------------------------------
 resource "aws_security_group" "sg" {
+  count = length(var.vpc_security_group_ids) == 0 ? 1 : 0
   name       = "${var.environment}-${var.role}-security_group"
   vpc_id     = var.vpc_id
 
@@ -109,16 +107,26 @@ resource "aws_security_group" "sg" {
     create_before_destroy = true
   }
 
-  tags = merge(
-    var.tags,
-    {
-      Name = "${var.environment}-${var.role}-security_group"
-    },
+  tags = var.tags
+}
+
+locals {
+  vpc_security_group_ids = (
+    length(var.vpc_security_group_ids) == 0 ?
+    aws_security_group.sg :
+    var.vpc_security_group_ids
   )
- }
+
+  # Security group rules are ignored if vpc_security_group_ids variable is provided explicitly
+  sg_rules = (
+    length(var.vpc_security_group_ids) == 0 ? 
+    var.sg_rules :
+    []
+  )
+}
 
 resource "aws_security_group_rule" "rule" {
-  for_each          = var.sg_rules
+  for_each          = local.sg_rules
 
   type              = each.value.type
   description       = each.key
@@ -126,7 +134,7 @@ resource "aws_security_group_rule" "rule" {
   to_port           = each.value.to_port
   protocol          = each.value.protocol
   cidr_blocks       = [each.value.cidr]
-  security_group_id = aws_security_group.sg.id
+  security_group_id = aws_security_group.sg[0].id
 }
 
 # -------------------------------------------
@@ -141,7 +149,7 @@ resource "aws_instance" "instance" {
   secondary_private_ips = var.ec2_secondary_private_ip == null ? null : [var.ec2_secondary_private_ip]
 
   iam_instance_profile   = length(aws_iam_instance_profile.profile) > 0 ? aws_iam_instance_profile.profile[0].id : null
-  vpc_security_group_ids = [aws_security_group.sg.id]
+  vpc_security_group_ids = local.vpc_security_group_ids
 
   root_block_device {
     volume_size = var.ec2_volume_size
@@ -193,8 +201,8 @@ data "aws_route53_zone" "domain" {
   private_zone = var.route53_zone_private
 }
 
-//this is required because of a limitation with terraform
-// in some cases if the instnace modified terraform will not
+// This is required because of a limitation with terraform.
+// In some cases if the instance modified, terraform will not
 // recognize this in its planning stage, this forces lookup of the data
 data "aws_instance" "instance" {
   instance_id = aws_instance.instance.id

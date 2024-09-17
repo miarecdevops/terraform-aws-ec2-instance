@@ -87,8 +87,15 @@ variable "ec2_assign_secondary_eip" {
 
 
 # Security Group settings
+
+variable "vpc_security_group_ids" {
+  description = "Security groups to assign to instance (optional). If not provided, then an implicit security group will be created"
+  type = list(string)
+  default = []
+}
+
 variable "sg_rules" {
-  description = "Securtity group rules applied to instance instance"
+  description = "Securtity group rules applied to the implicitely created security group (optional). It is ignored if vpc_security_group_ids is provided"
   type        = map(map(string))
   default     = {
     SSH = {
