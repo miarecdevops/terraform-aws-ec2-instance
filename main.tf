@@ -121,7 +121,7 @@ locals {
   sg_rules = (
     length(var.vpc_security_group_ids) == 0 ? 
     var.sg_rules :
-    []
+    {}
   )
 }
 
