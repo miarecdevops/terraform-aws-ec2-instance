@@ -113,7 +113,7 @@ resource "aws_security_group" "sg" {
 locals {
   vpc_security_group_ids = (
     length(var.vpc_security_group_ids) == 0 ?
-    aws_security_group.sg :
+    aws_security_group.sg[*].id :
     var.vpc_security_group_ids
   )
 
