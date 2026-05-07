@@ -42,15 +42,23 @@ variable "ec2_ami_image-type" {
 
 
 variable "ec2_ami_os" {
-  description = "OS distribution that will be used for EC2, `centos` or `ubuntu`"
+  description = "OS distribution that will be used for EC2. Supported values: `centos`, `ubuntu`, `rocky`, `windows`."
   type        = string
   default     = "ubuntu"
 }
 
 variable "ec2_ami_os_release" {
-  description = "Distributiuon Release version, if ec2_ami_os = ubuntu , value should be `20.04` or `22.04`"
+  description = "Distribution release version. For `ubuntu`, use `20.04` or `22.04`; for `windows`, use `2019`, `2022`, or `2025` (defaults to `2022` when left at the module default)."
   type        = string
   default     = "20.04"
+
+  validation {
+    condition = var.ec2_ami_os != "windows" ? true : contains(
+      ["2019", "2022", "2025", "20.04"],
+      var.ec2_ami_os_release,
+    )
+    error_message = "When ec2_ami_os is \"windows\", ec2_ami_os_release must be 2019, 2022, or 2025 (leave at 20.04 to default to 2022)."
+  }
 }
 
 
@@ -90,36 +98,36 @@ variable "ec2_assign_secondary_eip" {
 
 variable "vpc_security_group_ids" {
   description = "Security groups to assign to instance (optional). If not provided, then an implicit security group will be created"
-  type = list(string)
-  default = []
+  type        = list(string)
+  default     = []
 }
 
 variable "sg_rules" {
   description = "Securtity group rules applied to the implicitely created security group (optional). It is ignored if vpc_security_group_ids is provided"
   type        = map(map(string))
-  default     = {
+  default = {
     SSH = {
-        type = "ingress"
-        from_port = 22
-        to_port = 22
-        protocol = "tcp"
-        cidr = "0.0.0.0/0"
+      type      = "ingress"
+      from_port = 22
+      to_port   = 22
+      protocol  = "tcp"
+      cidr      = "0.0.0.0/0"
     }
     egress = {
-        type      = "egress"
-        from_port = 0
-        to_port   = 0
-        protocol  = "-1"
-        cidr      = "0.0.0.0/0"
+      type      = "egress"
+      from_port = 0
+      to_port   = 0
+      protocol  = "-1"
+      cidr      = "0.0.0.0/0"
     }
   }
 }
 
 # IAM settings
 variable "iam_policies" {
-  description =  "Optional, IAM policies that will be attached to IAM Role (policies must be encoded in JSON format)"
-  type = map(string)
-  default = { }
+  description = "Optional, IAM policies that will be attached to IAM Role (policies must be encoded in JSON format)"
+  type        = map(string)
+  default     = {}
 }
 
 # EC2 instance settings
@@ -174,5 +182,4 @@ variable "route53_ttl" {
   description = "TTL of the DNS record, in seconds"
   default     = 300
 }
-
 

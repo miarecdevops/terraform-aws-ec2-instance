@@ -39,10 +39,13 @@ See [`variables.tf`](./variables.tf) for full list of variables
 
 This module has the ability to lookup the latest AMI based a few criteria, this is useful for quick deployment
 
-- `ec2_ami_os` OS that will be used for EC2, currently CentOS7 and Ubuntu are supported, default = `centos`
-    - `centos` = CentOS 7
-    - `ubuntu` = Ubuntu
-- `ec2_ami_os_release` (Optional) Release of Ubuntu,   default = `20.04`
+- `ec2_ami_os` OS that will be used for EC2. Supported values: `centos`, `ubuntu`, `rocky`, `windows`. Default = `ubuntu`.
+    - `centos` = CentOS 7 (owner `125523088429`)
+    - `ubuntu` = Ubuntu LTS images (owner `099720109477`)
+    - `rocky` = Rocky Linux (owner `792107900819`)
+    - `windows` = Windows Server Full-Base AMI resolved via AWS SSM public parameters
+- `ec2_ami_os_release` (Optional) Release selector. For Ubuntu use `20.04` or `22.04`. For Windows use `2019`, `2022`, or `2025` (defaults to `2022` when left at module default `20.04`).
+- When `ec2_ami_os = "windows"`, the module reads from `/aws/service/ami-windows-latest/Windows_Server-<release>-English-Full-Base`. Ensure the caller’s IAM role can read public SSM parameters.
 - `ec2_ami_virtualization` (Optional) AMI Virtualization type, default = `hvm`
 - `ec2_ami_archtecture` (Optional) AMI archetecture type, default = `x86_64`
 - `ec2_ami_image-type` (Optional) AMI image type, default = `machine`
@@ -125,6 +128,40 @@ module "public" {
     }
 }
 
+```
+
+> Windows Server example (Full-Base AMI via SSM)
+
+```hcl
+module "windows" {
+  source = "github.com/miarecdevops/terraform-aws-ec2-instance.git"
+
+  environment = "qa"
+  role        = "windows"
+
+  ec2_ami_os         = "windows"
+  ec2_ami_os_release = "2022" # or 2019 / 2025
+  ec2_instance_type  = "m6i.large"
+  ec2_volume_size    = 80
+  ec2_ssh_key_name   = aws_key_pair.windows.key_name
+
+  sg_rules = {
+    RDP = {
+      type      = "ingress"
+      from_port = 3389
+      to_port   = 3389
+      protocol  = "tcp"
+      cidr      = "0.0.0.0/0"
+    }
+    egress = {
+      type      = "egress"
+      from_port = 0
+      to_port   = 0
+      protocol  = "-1"
+      cidr      = "0.0.0.0/0"
+    }
+  }
+}
 ```
 
 ## Outputs

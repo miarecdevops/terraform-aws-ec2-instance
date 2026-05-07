@@ -15,9 +15,33 @@ locals {
     rocky  = "Rocky-${var.ec2_ami_os_release}-*"
   }
 
+  windows_ssm_release_default = "2022"
+  windows_ssm_parameter_names = {
+    "2019" = "/aws/service/ami-windows-latest/Windows_Server-2019-English-Full-Base"
+    "2022" = "/aws/service/ami-windows-latest/Windows_Server-2022-English-Full-Base"
+    "2025" = "/aws/service/ami-windows-latest/Windows_Server-2025-English-Full-Base"
+  }
+
+  windows_effective_release = (
+    var.ec2_ami_os == "windows" ?
+    (
+      var.ec2_ami_os_release == "20.04" ?
+      local.windows_ssm_release_default :
+      var.ec2_ami_os_release
+    ) :
+    null
+  )
+
+  windows_ssm_parameter_name = (
+    var.ec2_ami_os == "windows" ?
+    local.windows_ssm_parameter_names[local.windows_effective_release] :
+    null
+  )
+
 }
 
 data "aws_ami" "ami" {
+  count       = var.ec2_ami_os == "windows" ? 0 : 1
   most_recent = true
   owners      = [lookup(local.ami_owner, var.ec2_ami_os, "099720109477")]
 
@@ -42,6 +66,20 @@ data "aws_ami" "ami" {
   }
 }
 
+data "aws_ssm_parameter" "windows_ami" {
+  count = var.ec2_ami_os == "windows" ? 1 : 0
+  name  = local.windows_ssm_parameter_name
+}
+
+locals {
+  linux_ami_id   = var.ec2_ami_os == "windows" ? null : data.aws_ami.ami[0].id
+  windows_ami_id = var.ec2_ami_os == "windows" ? data.aws_ssm_parameter.windows_ami[0].value : null
+  resolved_ami_id = coalesce(
+    var.ec2_ami_id,
+    var.ec2_ami_os == "windows" ? local.windows_ami_id : local.linux_ami_id,
+  )
+}
+
 
 // --------------------------------------------
 // Network
@@ -59,8 +97,8 @@ locals {
 # Create IAM Role
 # --------------------------------------------
 resource "aws_iam_role" "role" {
-  count  = length(keys(var.iam_policies)) > 0 ? 1 : 0
-  name = "${var.environment}-${var.role}-iam_role"
+  count = length(keys(var.iam_policies)) > 0 ? 1 : 0
+  name  = "${var.environment}-${var.role}-iam_role"
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
     Statement = [
@@ -81,16 +119,16 @@ resource "aws_iam_role" "role" {
 # Create IAM Role Policies and attach to IAM Role
 resource "aws_iam_role_policy" "policy" {
   for_each = var.iam_policies
-  name = "${var.environment}-${var.role}-${each.key}-policy"
-  role = aws_iam_role.role[0].id
+  name     = "${var.environment}-${var.role}-${each.key}-policy"
+  role     = aws_iam_role.role[0].id
 
   policy = each.value
 }
 
 resource "aws_iam_instance_profile" "profile" {
-  count  = length(keys(var.iam_policies)) > 0 ? 1 : 0
-  name = "${var.environment}-${var.role}-iam_instance_policy"
-  role = aws_iam_role.role[0].name
+  count = length(keys(var.iam_policies)) > 0 ? 1 : 0
+  name  = "${var.environment}-${var.role}-iam_instance_policy"
+  role  = aws_iam_role.role[0].name
 }
 
 # -------------------------------------------
@@ -99,9 +137,9 @@ resource "aws_iam_instance_profile" "profile" {
 # when vpc_security_group_ids is not provided explicitely.
 # -------------------------------------------
 resource "aws_security_group" "sg" {
-  count = length(var.vpc_security_group_ids) == 0 ? 1 : 0
-  name       = "${var.environment}-${var.role}-security_group"
-  vpc_id     = var.vpc_id
+  count  = length(var.vpc_security_group_ids) == 0 ? 1 : 0
+  name   = "${var.environment}-${var.role}-security_group"
+  vpc_id = var.vpc_id
 
   lifecycle {
     create_before_destroy = true
@@ -119,14 +157,14 @@ locals {
 
   # Security group rules are ignored if vpc_security_group_ids variable is provided explicitly
   sg_rules = (
-    length(var.vpc_security_group_ids) == 0 ? 
+    length(var.vpc_security_group_ids) == 0 ?
     var.sg_rules :
     {}
   )
 }
 
 resource "aws_security_group_rule" "rule" {
-  for_each          = local.sg_rules
+  for_each = local.sg_rules
 
   type              = each.value.type
   description       = each.key
@@ -141,7 +179,7 @@ resource "aws_security_group_rule" "rule" {
 # Build EC2 Instance
 # -------------------------------------------
 resource "aws_instance" "instance" {
-  ami           = var.ec2_ami_id == null ? data.aws_ami.ami.id : var.ec2_ami_id
+  ami           = local.resolved_ami_id
   key_name      = var.ec2_ssh_key_name
   instance_type = var.ec2_instance_type
   subnet_id     = var.ec2_subnet_id
@@ -156,15 +194,15 @@ resource "aws_instance" "instance" {
   }
 
   metadata_options {
-    http_endpoint          = var.ec2_metadata == true ? "enabled": "disabled"
-    instance_metadata_tags = var.ec2_metadata == true ? "enabled": "disabled"
+    http_endpoint          = var.ec2_metadata == true ? "enabled" : "disabled"
+    instance_metadata_tags = var.ec2_metadata == true ? "enabled" : "disabled"
   }
 
 
   user_data = var.user_data
 
   lifecycle {
-    ignore_changes = [ami]    # prevents re-creation of instance if AMI changes due to update in AWS registry
+    ignore_changes = [ami] # prevents re-creation of instance if AMI changes due to update in AWS registry
   }
 
   tags = merge(
@@ -181,14 +219,14 @@ resource "aws_instance" "instance" {
 # -------------------------------------------
 
 resource "aws_eip" "eip" {
-  count = var.ec2_assign_eip == true ? 1 : 0
+  count    = var.ec2_assign_eip == true ? 1 : 0
   instance = aws_instance.instance.id
 }
 
 # Create EIP for secondary IP address if it exists and if requested
 resource "aws_eip" "secondary_eip" {
-  count = var.ec2_secondary_private_ip != null && var.ec2_assign_secondary_eip == true ? 1 : 0
-  instance = aws_instance.instance.id
+  count                     = var.ec2_secondary_private_ip != null && var.ec2_assign_secondary_eip == true ? 1 : 0
+  instance                  = aws_instance.instance.id
   associate_with_private_ip = var.ec2_secondary_private_ip
 }
 
@@ -220,9 +258,9 @@ resource "aws_route53_record" "record" {
   type    = "A"
   ttl     = var.route53_ttl
   records = [var.route53_zone_private == true ?
-             data.aws_instance.instance.private_ip :
-             var.ec2_assign_eip == true ?
-                aws_eip.eip[0].public_ip :
-                aws_instance.instance.public_ip
-             ]
+    data.aws_instance.instance.private_ip :
+    var.ec2_assign_eip == true ?
+    aws_eip.eip[0].public_ip :
+    aws_instance.instance.public_ip
+  ]
 }
