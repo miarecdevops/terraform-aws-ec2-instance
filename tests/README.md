@@ -29,6 +29,9 @@ clean up.
 - Install [Terraform](https://www.terraform.io/downloads.html).
 - Configure your AWS credentials using one of the [options supported by the AWS SDK](http://docs.aws.amazon.com/sdk-for-java/v1/developer-guide/credentials.html).  
   Usually, the easiest option is to set the `AWS_ACCESS_KEY_ID` and `AWS_SECRET_ACCESS_KEY` environment variables.
+- The Windows example plan test expects AWS credentials with permission to read the public SSM parameters under
+  `/aws/service/ami-windows-latest/Windows_Server-*-English-Full-Base`. Without those credentials the test will be
+  skipped.
 
 
 ### Run all the tests
