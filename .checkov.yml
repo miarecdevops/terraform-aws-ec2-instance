@@ -1,0 +1,28 @@
+# checkov configuration. Run with `mise run lint` or `checkov -d .`.
+framework:
+  - terraform
+quiet: true
+compact: true
+# Do not fetch guideline mappings from the vendor API on every run.
+skip-download: true
+
+skip-check:
+  # False positives: checkov's graph does not follow `count` indexes or the
+  # `instance` argument of aws_eip. The security group is attached through
+  # local.vpc_security_group_ids and both Elastic IPs set `instance`.
+  - CKV2_AWS_5 # Ensure that Security Groups are attached to another resource
+  - CKV2_AWS_19 # Ensure that all EIP addresses allocated to a VPC are attached to EC2 instances
+
+  # Deliberate choices for this module. Detailed monitoring costs money and
+  # EBS optimization is on by default for current instance types.
+  - CKV_AWS_126 # Ensure that detailed monitoring is enabled for EC2 instances
+  - CKV_AWS_135 # Ensure that EC2 is EBS optimized
+
+  # Skips that apply to one resource only are inline in the Terraform file,
+  # as "#checkov:skip=<ID>: <reason>" comments inside the resource block.
+
+  # The security group name already says which environment and role it
+  # belongs to, so a description would only repeat it. The provider sets
+  # "Managed by Terraform" when none is given. Adding one later would also
+  # force replacement of the group in every existing deployment.
+  - CKV_AWS_23 # Ensure every security group and rule has a description

@@ -10,6 +10,7 @@
 go = "1.27"
 tflint = "0.64"
 golangci-lint = "2.13"
+checkov = "3.3"
 
 [env]
 # floci is a free, MIT-licensed AWS emulator. Pin the image to a release tag.
@@ -48,9 +49,13 @@ done
 """
 
 [tasks.lint]
-description = "Check formatting, run tflint on Terraform, and golangci-lint on Go"
-depends = ["fmt:check", "lint:go"]
+description = "Check formatting, run tflint and checkov on Terraform, and golangci-lint on Go"
+depends = ["fmt:check", "lint:go", "lint:checkov"]
 run = ["tflint --init", "tflint --recursive"]
+
+[tasks."lint:checkov"]
+description = "Run checkov security checks on all Terraform. Skips are listed in .checkov.yml"
+run = "checkov -d ."
 
 [tasks."lint:go"]
 description = "Run golangci-lint on the test code"

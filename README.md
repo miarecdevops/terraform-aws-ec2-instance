@@ -163,7 +163,7 @@ mise install
 | Task | Description |
 | --- | --- |
 | `mise run fmt` | Format all Terraform and Go files. |
-| `mise run lint` | Check formatting, run tflint on Terraform, and golangci-lint on Go. |
+| `mise run lint` | Check formatting, run tflint and checkov on Terraform, and golangci-lint on Go. Checkov skips are listed with reasons in `.checkov.yml`. |
 | `mise run validate` | Run `terraform validate` in every root module. |
 | `mise run test` | Start floci in Docker and run the Terratest suite. |
 | `mise run test:aws` | Deploy every example to a random US region of a real AWS account and check SSH access. Costs money. |

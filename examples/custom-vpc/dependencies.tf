@@ -64,6 +64,10 @@ locals {
 }
 
 resource "aws_vpc" "vpc" {
+  # This example is a minimal VPC to show the module. Production VPCs should
+  # enable flow logs and lock down the default security group.
+  #checkov:skip=CKV2_AWS_11: Example VPC has no flow logs
+  #checkov:skip=CKV2_AWS_12: Example VPC keeps the default security group as is
   cidr_block = var.vpc_cidr
 
   tags = {
@@ -76,6 +80,7 @@ resource "aws_vpc" "vpc" {
 // Public subnets
 // ---------------------------------------------------------
 resource "aws_subnet" "public_subnets" {
+  #checkov:skip=CKV_AWS_130: The instance must get a public IP so the test can SSH to it
   for_each = local.availability_zones_map
 
   vpc_id            = aws_vpc.vpc.id
