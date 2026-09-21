@@ -11,8 +11,8 @@ variable "role" {
 }
 
 variable "aws_profile" {
-  description = "AWS credentials profile name"
-  default     = "default"
+  description = "AWS credentials profile name. When null, the provider uses the default credential chain (environment variables, shared config, or an instance role)."
+  default     = null
   type        = string
 }
 

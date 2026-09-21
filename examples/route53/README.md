@@ -10,12 +10,16 @@ to install an instance in AWS account with DNS A record.
 
 ## Quick start
 
-Confiugre your AWS access keys as environmetn variables:
+Configure your AWS access keys as environment variables:
 
     export AWS_ACCESS_KEY_ID=(your access key id)
     export AWS_SECRET_ACCESS_KEY=(your secret access key)
 
-Or, configure AWS credentials via AWS CLI as `default` profile.
+Or, use a named profile from the AWS CLI configuration:
+
+    export TF_VAR_aws_profile=(your profile name)
+
+When no profile is given, the provider uses the default AWS credential chain.
 
 Deploy the code:
 
