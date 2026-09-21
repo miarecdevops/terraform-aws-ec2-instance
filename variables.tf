@@ -90,36 +90,39 @@ variable "ec2_assign_secondary_eip" {
 
 variable "vpc_security_group_ids" {
   description = "Security groups to assign to instance (optional). If not provided, then an implicit security group will be created"
-  type = list(string)
-  default = []
+  type        = list(string)
+  default     = []
+  nullable    = false
 }
 
 variable "sg_rules" {
   description = "Securtity group rules applied to the implicitely created security group (optional). It is ignored if vpc_security_group_ids is provided"
   type        = map(map(string))
-  default     = {
+  nullable    = false
+  default = {
     SSH = {
-        type = "ingress"
-        from_port = 22
-        to_port = 22
-        protocol = "tcp"
-        cidr = "0.0.0.0/0"
+      type      = "ingress"
+      from_port = 22
+      to_port   = 22
+      protocol  = "tcp"
+      cidr      = "0.0.0.0/0"
     }
     egress = {
-        type      = "egress"
-        from_port = 0
-        to_port   = 0
-        protocol  = "-1"
-        cidr      = "0.0.0.0/0"
+      type      = "egress"
+      from_port = 0
+      to_port   = 0
+      protocol  = "-1"
+      cidr      = "0.0.0.0/0"
     }
   }
 }
 
 # IAM settings
 variable "iam_policies" {
-  description =  "Optional, IAM policies that will be attached to IAM Role (policies must be encoded in JSON format)"
-  type = map(string)
-  default = { }
+  description = "Optional, IAM policies that will be attached to IAM Role (policies must be encoded in JSON format)"
+  type        = map(string)
+  default     = {}
+  nullable    = false
 }
 
 # EC2 instance settings

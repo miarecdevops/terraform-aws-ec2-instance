@@ -1,0 +1,85 @@
+# Tool versions and tasks for this repository.
+#
+# Terraform and the AWS CLI are expected to be pre-installed on the machine.
+# mise manages only the less frequently used tools.
+#
+# Install tools:  mise install
+# Run a task:     mise run <task>
+
+[tools]
+go = "1.27"
+tflint = "0.64"
+golangci-lint = "2.13"
+
+[env]
+# floci is a free, MIT-licensed AWS emulator. Pin the image to a release tag.
+# Each checkout gets its own container on a random free port. See scripts/floci.sh.
+FLOCI_IMAGE = "floci/floci:2.1.0"
+
+[tasks.fmt]
+description = "Format all Terraform and Go files"
+depends = ["fmt:go"]
+run = "terraform fmt -recursive"
+
+[tasks."fmt:go"]
+description = "Format Go files"
+dir = "tests"
+run = "golangci-lint fmt ./..."
+
+[tasks."fmt:check"]
+description = "Fail if any Terraform or Go file is not formatted"
+depends = ["fmt:check:go"]
+run = "terraform fmt -recursive -check -diff"
+
+[tasks."fmt:check:go"]
+description = "Fail if any Go file is not formatted"
+dir = "tests"
+run = "golangci-lint fmt --diff ./..."
+
+[tasks.validate]
+description = "Run terraform validate in every root module"
+run = """
+set -e
+for dir in examples/*/ tests/fixtures/*/; do
+  echo "==> $dir"
+  terraform -chdir="$dir" init -backend=false -input=false > /dev/null
+  terraform -chdir="$dir" validate
+done
+"""
+
+[tasks.lint]
+description = "Check formatting, run tflint on Terraform, and golangci-lint on Go"
+depends = ["fmt:check", "lint:go"]
+run = ["tflint --init", "tflint --recursive"]
+
+[tasks."lint:go"]
+description = "Run golangci-lint on the test code"
+dir = "tests"
+run = "golangci-lint run ./..."
+
+[tasks."floci:start"]
+description = "Start the floci container for this checkout if it is not running"
+run = "scripts/floci.sh start"
+
+[tasks."floci:stop"]
+description = "Stop and remove the floci container for this checkout"
+run = "scripts/floci.sh stop"
+
+[tasks.floci-url]
+description = "Print the URL of the floci container for this checkout"
+run = "scripts/floci.sh url"
+
+[tasks.test]
+description = "Run Terratest against floci"
+depends = ["floci:start"]
+run = """
+set -e
+export FLOCI_ENDPOINT="$(scripts/floci.sh url)"
+cd tests
+go test -v -count=1 -timeout 20m ./...
+"""
+
+[tasks."test:aws"]
+description = "Deploy every example to a real AWS account and check SSH access. Costs money."
+dir = "tests"
+run = "go test -v -count=1 -timeout 60m -tags aws -run 'TestExamplesOnAWS' ./..."

@@ -1,8 +1,22 @@
 terraform {
+  required_version = ">= 1.5"
+
   required_providers {
     aws = {
       source  = "hashicorp/aws"
-      version = "~> 4.24"
+      version = "~> 6.0"
+    }
+    local = {
+      source  = "hashicorp/local"
+      version = "~> 2.0"
+    }
+    random = {
+      source  = "hashicorp/random"
+      version = "~> 3.0"
+    }
+    tls = {
+      source  = "hashicorp/tls"
+      version = "~> 4.0"
     }
   }
 }
@@ -24,9 +38,9 @@ module "instance" {
   ]
 
   environment = var.environment
-  role = var.role
+  role        = var.role
 
-  vpc_id    = data.aws_vpc.default.id
+  vpc_id        = data.aws_vpc.default.id
   ec2_subnet_id = sort(data.aws_subnets.default.ids)[0]
 
   ec2_instance_type = var.instance_type
@@ -34,7 +48,7 @@ module "instance" {
   ec2_ssh_key_name  = aws_key_pair.generated_key.key_name
   ec2_volume_size   = 8
 
-  route53_a_record = "this-server"
-  route53_zone = local.route53_zone
+  route53_a_record     = "this-server"
+  route53_zone         = local.route53_zone
   route53_zone_private = true
 }

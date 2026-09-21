@@ -1,0 +1,14 @@
+# Terraform
+.terraform/
+.terraform.lock.hcl
+terraform.tfvars
+terraform.tfstate
+terraform.tfstate.*
+*.tfstate.backup
+
+# SSH private key written by the examples
+priv_key.pem
+
+# mise
+.mise.local.toml
+mise.local.toml

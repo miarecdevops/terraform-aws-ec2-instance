@@ -1,0 +1,22 @@
+version: "2"
+
+run:
+  # Lint the real-AWS suite too. It is excluded from the default build.
+  build-tags:
+    - aws
+
+linters:
+  default: standard
+  enable:
+    - errorlint
+    - gocritic
+    - misspell
+    - revive
+    - testifylint
+    - unconvert
+    - unparam
+
+formatters:
+  enable:
+    - gofmt
+    - goimports

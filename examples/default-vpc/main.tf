@@ -1,8 +1,22 @@
 terraform {
+  required_version = ">= 1.5"
+
   required_providers {
     aws = {
       source  = "hashicorp/aws"
-      version = "~> 4.24"
+      version = "~> 6.0"
+    }
+    local = {
+      source  = "hashicorp/local"
+      version = "~> 2.0"
+    }
+    random = {
+      source  = "hashicorp/random"
+      version = "~> 3.0"
+    }
+    tls = {
+      source  = "hashicorp/tls"
+      version = "~> 4.0"
     }
   }
 }
@@ -16,9 +30,9 @@ module "instance" {
   source = "../../"
 
   environment = var.environment
-  role = var.role
+  role        = var.role
 
-  vpc_id    = null
+  vpc_id        = null
   ec2_subnet_id = null
 
   ec2_instance_type = var.instance_type

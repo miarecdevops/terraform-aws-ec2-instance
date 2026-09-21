@@ -7,31 +7,36 @@ output "instance_tags" {
 }
 
 output "private_ip" {
-    value = aws_instance.instance.private_ip
+  value = aws_instance.instance.private_ip
 }
 
 output "public_ip" {
-    value = var.ec2_assign_eip == true ? aws_eip.eip[0].public_ip : aws_instance.instance.public_ip
+  value = var.ec2_assign_eip == true ? aws_eip.eip[0].public_ip : aws_instance.instance.public_ip
 }
 
 # Secondary IP output is a set, AWS allows multiple secondary IP to be assigned, out role does not
 # output is converting set to list, then pulling first entry
 output "secondary_private_ip" {
-    value = var.ec2_secondary_private_ip == null ? null : tolist(aws_instance.instance.secondary_private_ips)[0]
+  value = var.ec2_secondary_private_ip == null ? null : tolist(aws_instance.instance.secondary_private_ips)[0]
 }
 
 output "secondary_public_ip" {
-    value = var.ec2_secondary_private_ip != null && var.ec2_assign_secondary_eip == true ? aws_eip.secondary_eip[0].public_ip : null
+  value = var.ec2_secondary_private_ip != null && var.ec2_assign_secondary_eip == true ? aws_eip.secondary_eip[0].public_ip : null
 }
 
 output "fqdn" {
-    value = length(aws_route53_record.record) > 0 ? aws_route53_record.record[0].fqdn : null
+  value = length(aws_route53_record.record) > 0 ? aws_route53_record.record[0].fqdn : null
 }
 
 output "iam_role" {
-    value = length(aws_iam_role.role) > 0 ? aws_iam_role.role[0].arn : null
+  value = length(aws_iam_role.role) > 0 ? aws_iam_role.role[0].arn : null
+}
+
+output "security_group_ids" {
+  description = "Security groups attached to the instance. Either the group created by the module or the ones passed in vpc_security_group_ids."
+  value       = local.vpc_security_group_ids
 }
 
 output "az" {
-    value = aws_instance.instance.availability_zone
+  value = aws_instance.instance.availability_zone
 }

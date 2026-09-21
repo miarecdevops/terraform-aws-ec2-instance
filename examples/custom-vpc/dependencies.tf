@@ -48,17 +48,16 @@ resource "aws_key_pair" "generated_key" {
 
 # Create Local Copy of private key for storage
 resource "local_sensitive_file" "priv_key_pem" {
-  content = tls_private_key.generated_key.private_key_pem
-  filename          = "priv_key.pem"
-  file_permission   = "0600"
+  content         = tls_private_key.generated_key.private_key_pem
+  filename        = "priv_key.pem"
+  file_permission = "0600"
 }
 
 // ---------------------------------------------------------
 // VPC
 // ---------------------------------------------------------
 locals {
-  public_cidr_block  = cidrsubnet(var.vpc_cidr, 1, 0)
-  private_cidr_block = cidrsubnet(var.vpc_cidr, 1, 1)
+  public_cidr_block = cidrsubnet(var.vpc_cidr, 1, 0)
 
   // Define map zone_name => index
   availability_zones_map = { for idx, az in var.availability_zones : az => idx }

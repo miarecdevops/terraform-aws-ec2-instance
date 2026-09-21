@@ -1,29 +1,34 @@
+//go:build aws
+
 package tests
 
 import (
+	"context"
 	"crypto/x509"
 	"encoding/pem"
+	"errors"
 	"fmt"
-	"io/ioutil"
+	"os"
 	"strings"
 	"testing"
 	"time"
 
 	"github.com/gruntwork-io/terratest/modules/retry"
 	"github.com/gruntwork-io/terratest/modules/ssh"
-	crypto_ssh "golang.org/x/crypto/ssh"
+	cryptossh "golang.org/x/crypto/ssh"
 )
 
-func RSAKeyPairFromFile(fpath string) (*ssh.KeyPair, error) {
-
-	pemBytes, err := ioutil.ReadFile(fpath)
+// rsaKeyPairFromFile loads the PEM-encoded RSA private key the examples write
+// to disk and derives the public key from it.
+func rsaKeyPairFromFile(path string) (*ssh.KeyPair, error) {
+	pemBytes, err := os.ReadFile(path)
 	if err != nil {
 		return nil, err
 	}
 
 	pemBlock, _ := pem.Decode(pemBytes)
 	if pemBlock == nil {
-		return nil, fmt.Errorf("failed to decode PEM block containing private key")
+		return nil, errors.New("failed to decode PEM block containing private key")
 	}
 
 	privKey, err := x509.ParsePKCS1PrivateKey(pemBlock.Bytes)
@@ -31,68 +36,52 @@ func RSAKeyPairFromFile(fpath string) (*ssh.KeyPair, error) {
 		return nil, err
 	}
 
-	sshPubKey, err := crypto_ssh.NewPublicKey(privKey.Public())
+	sshPubKey, err := cryptossh.NewPublicKey(privKey.Public())
 	if err != nil {
 		return nil, err
 	}
 
-	sshPubKeyBytes := crypto_ssh.MarshalAuthorizedKey(sshPubKey)
-	sshPubKeyStr := string(sshPubKeyBytes)
-
-	return &ssh.KeyPair{PublicKey: sshPubKeyStr, PrivateKey: string(pemBytes)}, nil
+	return &ssh.KeyPair{
+		PublicKey:  string(cryptossh.MarshalAuthorizedKey(sshPubKey)),
+		PrivateKey: string(pemBytes),
+	}, nil
 }
 
-func testSSHToPublicHost(t *testing.T, publicInstanceIP string, keyPair *ssh.KeyPair) {
-	// We're going to try to SSH to the instance IP, using the Key Pair we created earlier, and the user "ubuntu",
-	// as we know the Instance is running an Ubuntu AMI that has such a user
-	publicHost := ssh.Host{
-		Hostname:    publicInstanceIP,
+// checkSSHToHost connects to the instance as the ubuntu user and checks that
+// command output and exit codes come back.
+func checkSSHToHost(ctx context.Context, t *testing.T, publicIP string, keyPair *ssh.KeyPair) {
+	t.Helper()
+
+	host := &ssh.Host{
+		Hostname:    publicIP,
 		SshKeyPair:  keyPair,
 		SshUserName: "ubuntu",
 	}
 
-	// It can take a minute or so for the Instance to boot up, so retry a few times
-	maxRetries := 30
-	timeBetweenRetries := 5 * time.Second
-	description := fmt.Sprintf("SSH to public host %s", publicInstanceIP)
+	// It can take a minute or so for the instance to boot, so retry.
+	const maxRetries = 30
+	const timeBetweenRetries = 5 * time.Second
+	const expectedText = "Hello, World"
 
-	// Run a simple echo command on the server
-	expectedText := "Hello, World"
-	command := fmt.Sprintf("echo -n '%s'", expectedText)
-
-	// Verify that we can SSH to the Instance and run commands
-	retry.DoWithRetry(t, description, maxRetries, timeBetweenRetries, func() (string, error) {
-		actualText, err := ssh.CheckSshCommandE(t, publicHost, command)
-
+	retry.DoWithRetryContext(t, ctx, "SSH to "+publicIP, maxRetries, timeBetweenRetries, func() (string, error) {
+		actualText, err := ssh.CheckSSHCommandContextE(t, ctx, host, fmt.Sprintf("echo -n '%s'", expectedText))
 		if err != nil {
 			return "", err
 		}
-
 		if strings.TrimSpace(actualText) != expectedText {
-			return "", fmt.Errorf("Expected SSH command to return '%s' but got '%s'", expectedText, actualText)
+			return "", fmt.Errorf("expected SSH command to return %q but got %q", expectedText, actualText)
 		}
-
 		return "", nil
 	})
 
-	// Run a command on the server that results in an error,
-	expectedText = "Hello, World"
-	command = fmt.Sprintf("echo -n '%s' && exit 1", expectedText)
-	description = fmt.Sprintf("SSH to public host %s with error command", publicInstanceIP)
-
-	// Verify that we can SSH to the Instance, run the command and see the output
-	retry.DoWithRetry(t, description, maxRetries, timeBetweenRetries, func() (string, error) {
-
-		actualText, err := ssh.CheckSshCommandE(t, publicHost, command)
-
+	retry.DoWithRetryContext(t, ctx, "SSH to "+publicIP+" with a failing command", maxRetries, timeBetweenRetries, func() (string, error) {
+		actualText, err := ssh.CheckSSHCommandContextE(t, ctx, host, fmt.Sprintf("echo -n '%s' && exit 1", expectedText))
 		if err == nil {
-			return "", fmt.Errorf("Expected SSH command to return an error but got none")
+			return "", errors.New("expected SSH command to return an error but got none")
 		}
-
 		if strings.TrimSpace(actualText) != expectedText {
-			return "", fmt.Errorf("Expected SSH command to return '%s' but got '%s'", expectedText, actualText)
+			return "", fmt.Errorf("expected SSH command to return %q but got %q", expectedText, actualText)
 		}
-
 		return "", nil
 	})
 }
