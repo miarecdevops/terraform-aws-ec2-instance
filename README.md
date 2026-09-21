@@ -124,7 +124,7 @@ The lookup picks the most recent image from the official owner account that matc
 | Name | Description | Default |
 | --- | --- | --- |
 | `iam_policies` | Inline policies for the instance role, as policy name to JSON document. When empty, no role or instance profile is created. | `{}` |
-| `ec2_metadata` | Enable the instance metadata endpoint and instance tags in metadata. | `true` |
+| `ec2_metadata` | Enable the instance metadata endpoint and instance tags in metadata. The endpoint requires IMDSv2; software that reads metadata must use session tokens. | `true` |
 | `user_data` | Script to run on first boot. | `null` |
 | `tags` | Tags for every resource. The module adds `Name` and `Role` on the instance. | `{}` |
 

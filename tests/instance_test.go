@@ -61,6 +61,7 @@ func TestDefaultInstance(t *testing.T) {
 		require.NotNil(t, inst.MetadataOptions)
 		assert.Equal(t, ec2types.InstanceMetadataEndpointStateEnabled, inst.MetadataOptions.HttpEndpoint)
 		assert.Equal(t, ec2types.InstanceMetadataTagsStateEnabled, inst.MetadataOptions.InstanceMetadataTags)
+		assert.Equal(t, ec2types.HttpTokensStateRequired, inst.MetadataOptions.HttpTokens, "IMDSv2 should be required")
 
 		assert.Equal(t, map[string]string{
 			"Name":        env + "-" + fixtureRole,

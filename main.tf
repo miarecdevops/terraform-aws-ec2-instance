@@ -158,6 +158,9 @@ resource "aws_instance" "instance" {
   metadata_options {
     http_endpoint          = var.ec2_metadata == true ? "enabled" : "disabled"
     instance_metadata_tags = var.ec2_metadata == true ? "enabled" : "disabled"
+    # Require IMDSv2. IMDSv1 answers unauthenticated requests, which lets an
+    # SSRF bug in any service on the instance read the role credentials.
+    http_tokens = "required"
   }
 
 

@@ -143,7 +143,7 @@ variable "ec2_volume_size" {
 
 variable "ec2_metadata" {
   type        = bool
-  description = "Set to TRUE, instance metadata will be available via IMDSv1"
+  description = "Enable the instance metadata endpoint and instance tags in metadata. The endpoint always requires IMDSv2 (session tokens)"
   default     = true
 }
 
