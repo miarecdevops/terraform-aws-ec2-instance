@@ -42,7 +42,7 @@ resource "random_id" "tls_key_suffix" {
 
 # Create AWS Key Pair
 resource "aws_key_pair" "generated_key" {
-  key_name   = "${var.environment}-${var.role}-key-${random_id.tls_key_suffix.hex}"
+  key_name   = "${var.stack}-${var.role}-key-${random_id.tls_key_suffix.hex}"
   public_key = tls_private_key.generated_key.public_key_openssh
 }
 
@@ -92,6 +92,6 @@ resource "aws_route53_zone" "private" {
   }
 
   tags = {
-    Name = "${var.environment}-${var.role}-private-zone"
+    Name = "${var.stack}-${var.role}-private-zone"
   }
 }

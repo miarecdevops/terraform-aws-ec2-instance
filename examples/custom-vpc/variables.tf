@@ -1,5 +1,5 @@
-variable "environment" {
-  description = "Name of environment (all tags will be prefixed with such name)"
+variable "stack" {
+  description = "Name of the stack. Prefixes the name of every resource."
   type        = string
   default     = "ec2-instance-module-custom-vpc"
 }

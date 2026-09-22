@@ -42,7 +42,7 @@ resource "random_id" "tls_key_suffix" {
 
 # Create AWS Key Pair
 resource "aws_key_pair" "generated_key" {
-  key_name   = "${var.environment}-${var.role}-key-${random_id.tls_key_suffix.hex}"
+  key_name   = "${var.stack}-${var.role}-key-${random_id.tls_key_suffix.hex}"
   public_key = tls_private_key.generated_key.public_key_openssh
 }
 
@@ -71,8 +71,8 @@ resource "aws_vpc" "vpc" {
   cidr_block = var.vpc_cidr
 
   tags = {
-    Name        = "${var.environment}-vpc"
-    Environment = var.environment
+    Name  = "${var.stack}-vpc"
+    Stack = var.stack
   }
 }
 
@@ -90,8 +90,8 @@ resource "aws_subnet" "public_subnets" {
   map_public_ip_on_launch = true
 
   tags = {
-    Name        = "${var.environment}-${each.key}-public-subnet"
-    Environment = var.environment
+    Name  = "${var.stack}-${each.key}-public-subnet"
+    Stack = var.stack
   }
 }
 
@@ -102,8 +102,8 @@ resource "aws_subnet" "public_subnets" {
 resource "aws_internet_gateway" "ig" {
   vpc_id = aws_vpc.vpc.id
   tags = {
-    Name        = "${var.environment}-igw"
-    Environment = var.environment
+    Name  = "${var.stack}-igw"
+    Stack = var.stack
   }
 }
 
@@ -118,8 +118,8 @@ resource "aws_route_table" "public_route_table" {
     gateway_id = aws_internet_gateway.ig.id
   }
   tags = {
-    Name        = "${var.environment}-public-route-table"
-    Environment = var.environment
+    Name  = "${var.stack}-public-route-table"
+    Stack = var.stack
   }
 }
 

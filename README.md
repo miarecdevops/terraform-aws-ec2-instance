@@ -12,7 +12,7 @@ Terraform module that creates an EC2 instance and the resources around it:
 
 | Name | Version |
 | --- | --- |
-| Terraform | >= 1.5 |
+| Terraform | >= 1.9 |
 | AWS provider | >= 5.0 |
 
 The module doesn't declare a provider. Configure the AWS provider in the calling project.
@@ -25,8 +25,8 @@ Private instance in an existing VPC, latest Ubuntu 22.04 AMI, with access to S3:
 module "private" {
   source = "github.com/miarecdevops/terraform-aws-ec2-instance.git"
 
-  environment = "prod"
-  role        = "worker"
+  stack = "myapp.prod.example.com"
+  role  = "worker"
 
   vpc_id        = module.network.vpc_id
   ec2_subnet_id = module.network.private_subnet_ids[0]
@@ -61,8 +61,8 @@ module "public" {
   source = "github.com/miarecdevops/terraform-aws-ec2-instance.git"
   count  = 2
 
-  environment = "prod"
-  role        = "web${count.index}"
+  stack = "myapp.prod.example.com"
+  role  = "web${count.index}"
 
   vpc_id         = module.network.vpc_id
   ec2_subnet_id  = module.network.public_subnet_ids[0]
@@ -88,7 +88,7 @@ See [`variables.tf`](./variables.tf) for the full list with types and defaults.
 
 | Name | Description |
 | --- | --- |
-| `environment` | Name of the environment. Prefixes the name of every resource. |
+| `stack` | Name of the stack the instance belongs to, for example `myapp.prod.example.com`. Prefixes the name of every resource. |
 | `role` | Role of the instance. Used in resource names and the `Role` tag. |
 | `ec2_instance_type` | EC2 instance type. |
 | `ec2_volume_size` | Root volume size in GB. |
@@ -127,6 +127,12 @@ The lookup picks the most recent image from the official owner account that matc
 | `ec2_metadata` | Enable the instance metadata endpoint and instance tags in metadata. The endpoint requires IMDSv2; software that reads metadata must use session tokens. | `true` |
 | `user_data` | Script to run on first boot. | `null` |
 | `tags` | Tags for every resource. The module adds `Name` and `Role` on the instance. | `{}` |
+
+### Deprecated
+
+| Name | Description | Default |
+| --- | --- | --- |
+| `environment` | Use `stack` instead. Kept so existing callers keep working. Used as the resource name prefix only when `stack` is `null`. | `null` |
 
 ### Route53
 

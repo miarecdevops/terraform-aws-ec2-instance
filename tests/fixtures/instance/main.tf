@@ -3,7 +3,7 @@
 # as a variable so one fixture serves all tests.
 
 terraform {
-  required_version = ">= 1.5"
+  required_version = ">= 1.9"
 
   required_providers {
     aws = {
@@ -22,9 +22,9 @@ variable "floci_endpoint" {
   description = "URL of the floci edge endpoint."
 }
 
-variable "environment" {
+variable "stack" {
   type        = string
-  description = "Environment name. Prefixes the name of every resource."
+  description = "Stack name. Prefixes the name of every resource."
 }
 
 variable "role" {
@@ -130,7 +130,7 @@ resource "tls_private_key" "key" {
 }
 
 resource "aws_key_pair" "key" {
-  key_name   = "${var.environment}-${var.role}-key"
+  key_name   = "${var.stack}-${var.role}-key"
   public_key = tls_private_key.key.public_key_openssh
 }
 
@@ -166,7 +166,7 @@ locals {
 resource "aws_security_group" "existing" {
   count = var.use_existing_security_group ? 1 : 0
 
-  name   = "${var.environment}-${var.role}-existing"
+  name   = "${var.stack}-${var.role}-existing"
   vpc_id = data.aws_vpc.default.id
 }
 
@@ -189,8 +189,8 @@ module "instance" {
 
   depends_on = [aws_route53_zone.private]
 
-  environment = var.environment
-  role        = var.role
+  stack = var.stack
+  role  = var.role
 
   vpc_id        = data.aws_vpc.default.id
   ec2_subnet_id = data.aws_subnet.selected.id
@@ -226,7 +226,7 @@ module "instance" {
   route53_zone_private = true
 
   tags = {
-    Environment = var.environment
+    Stack = var.stack
   }
 }
 

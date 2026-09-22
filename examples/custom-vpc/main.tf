@@ -1,5 +1,5 @@
 terraform {
-  required_version = ">= 1.5"
+  required_version = ">= 1.9"
 
   required_providers {
     aws = {
@@ -29,8 +29,8 @@ provider "aws" {
 module "instance" {
   source = "../../"
 
-  environment = var.environment
-  role        = var.role
+  stack = var.stack
+  role  = var.role
 
   vpc_id        = aws_vpc.vpc.id
   ec2_subnet_id = aws_subnet.public_subnets[var.availability_zones[0]].id

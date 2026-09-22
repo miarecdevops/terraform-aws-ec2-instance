@@ -1,7 +1,19 @@
 # Global settings
-variable "environment" {
-  description = "Name of environment (all tags will start with this name)"
+variable "stack" {
+  description = "Name of the stack this instance belongs to, for example bastion1.prod.miarec.net. Prefixes the name of every resource."
   type        = string
+  default     = null
+
+  validation {
+    condition     = var.stack != null || var.environment != null
+    error_message = "Set stack. The environment variable is deprecated."
+  }
+}
+
+variable "environment" {
+  description = "Deprecated. Use stack. Kept so existing callers keep working; used only when stack is null."
+  type        = string
+  default     = null
 }
 
 variable "role" {

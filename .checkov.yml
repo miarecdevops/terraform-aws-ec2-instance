@@ -21,7 +21,7 @@ skip-check:
   # Skips that apply to one resource only are inline in the Terraform file,
   # as "#checkov:skip=<ID>: <reason>" comments inside the resource block.
 
-  # The security group name already says which environment and role it
+  # The security group name already says which stack and role it
   # belongs to, so a description would only repeat it. The provider sets
   # "Managed by Terraform" when none is given. Adding one later would also
   # force replacement of the group in every existing deployment.

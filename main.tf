@@ -53,6 +53,9 @@ data "aws_vpc" "default" {
 
 locals {
   vpc_id = var.vpc_id != null ? var.vpc_id : data.aws_vpc.default.id
+
+  # Resource name prefix. Falls back to the deprecated environment variable.
+  stack = var.stack != null ? var.stack : var.environment
 }
 
 # --------------------------------------------
@@ -60,7 +63,7 @@ locals {
 # --------------------------------------------
 resource "aws_iam_role" "role" {
   count = length(keys(var.iam_policies)) > 0 ? 1 : 0
-  name  = "${var.environment}-${var.role}-iam_role"
+  name  = "${local.stack}-${var.role}-iam_role"
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
     Statement = [
@@ -81,7 +84,7 @@ resource "aws_iam_role" "role" {
 # Create IAM Role Policies and attach to IAM Role
 resource "aws_iam_role_policy" "policy" {
   for_each = var.iam_policies
-  name     = "${var.environment}-${var.role}-${each.key}-policy"
+  name     = "${local.stack}-${var.role}-${each.key}-policy"
   role     = aws_iam_role.role[0].id
 
   policy = each.value
@@ -89,7 +92,7 @@ resource "aws_iam_role_policy" "policy" {
 
 resource "aws_iam_instance_profile" "profile" {
   count = length(keys(var.iam_policies)) > 0 ? 1 : 0
-  name  = "${var.environment}-${var.role}-iam_instance_policy"
+  name  = "${local.stack}-${var.role}-iam_instance_policy"
   role  = aws_iam_role.role[0].name
 }
 
@@ -100,7 +103,7 @@ resource "aws_iam_instance_profile" "profile" {
 # -------------------------------------------
 resource "aws_security_group" "sg" {
   count  = length(var.vpc_security_group_ids) == 0 ? 1 : 0
-  name   = "${var.environment}-${var.role}-security_group"
+  name   = "${local.stack}-${var.role}-security_group"
   vpc_id = local.vpc_id
 
   lifecycle {
@@ -174,7 +177,7 @@ resource "aws_instance" "instance" {
     var.tags,
     {
       Role = var.role
-      Name = "${var.environment}-${var.role}"
+      Name = "${local.stack}-${var.role}"
     },
   )
 }

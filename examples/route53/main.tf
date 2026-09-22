@@ -1,5 +1,5 @@
 terraform {
-  required_version = ">= 1.5"
+  required_version = ">= 1.9"
 
   required_providers {
     aws = {
@@ -37,8 +37,8 @@ module "instance" {
     aws_route53_zone.private
   ]
 
-  environment = var.environment
-  role        = var.role
+  stack = var.stack
+  role  = var.role
 
   vpc_id        = data.aws_vpc.default.id
   ec2_subnet_id = sort(data.aws_subnets.default.ids)[0]

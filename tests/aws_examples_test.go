@@ -39,7 +39,7 @@ func TestExamplesOnAWS(t *testing.T) {
 			instanceType := aws.GetRecommendedInstanceTypeContext(t, ctx, awsRegion, []string{"t2.micro", "t3.micro"})
 
 			vars := map[string]any{
-				"environment":   "terratest-" + example + "-" + strings.ToLower(random.UniqueID()),
+				"stack":         "terratest-" + example + "-" + strings.ToLower(random.UniqueID()),
 				"aws_region":    awsRegion,
 				"instance_type": instanceType,
 			}

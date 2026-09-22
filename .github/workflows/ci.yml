@@ -10,7 +10,7 @@ permissions:
 
 env:
   # Test against the minimum supported Terraform version.
-  TERRAFORM_VERSION: "1.5.7"
+  TERRAFORM_VERSION: "1.9.8"
 
 jobs:
   lint:

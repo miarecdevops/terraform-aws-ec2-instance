@@ -29,7 +29,7 @@ const (
 	canonicalOwnerID     = "099720109477"
 
 	// Role passed to the module in every test. Resource names are
-	// "<environment>-<role>-<suffix>".
+	// "<stack>-<role>-<suffix>".
 	fixtureRole = "test"
 )
 
@@ -39,10 +39,10 @@ func TestDefaultInstance(t *testing.T) {
 	t.Parallel()
 
 	ctx := t.Context()
-	env := uniqueEnvironment()
+	env := uniqueStack()
 	opts := fixtureOptions(t, map[string]any{
 		"floci_endpoint": flociEndpoint(),
-		"environment":    env,
+		"stack":          env,
 	})
 	defer terraform.DestroyContext(t, ctx, opts)
 	terraform.InitAndApplyAndIdempotentContext(t, ctx, opts)
@@ -64,9 +64,9 @@ func TestDefaultInstance(t *testing.T) {
 		assert.Equal(t, ec2types.HttpTokensStateRequired, inst.MetadataOptions.HttpTokens, "IMDSv2 should be required")
 
 		assert.Equal(t, map[string]string{
-			"Name":        env + "-" + fixtureRole,
-			"Role":        fixtureRole,
-			"Environment": env,
+			"Name":  env + "-" + fixtureRole,
+			"Role":  fixtureRole,
+			"Stack": env,
 		}, tagsToMap(inst.Tags))
 	})
 
@@ -135,7 +135,7 @@ func TestAMILookup(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			t.Parallel()
 
-			vars := map[string]any{"floci_endpoint": flociEndpoint(), "environment": uniqueEnvironment()}
+			vars := map[string]any{"floci_endpoint": flociEndpoint(), "stack": uniqueStack()}
 			for k, v := range tc.vars {
 				vars[k] = v
 			}
@@ -167,7 +167,7 @@ func TestAMILookup(t *testing.T) {
 
 		opts := fixtureOptions(t, map[string]any{
 			"floci_endpoint": flociEndpoint(),
-			"environment":    uniqueEnvironment(),
+			"stack":          uniqueStack(),
 			"ami_id":         amiID,
 		})
 		defer terraform.DestroyContext(t, ctx, opts)
@@ -190,7 +190,7 @@ func TestElasticIPs(t *testing.T) {
 	ctx := t.Context()
 	opts := fixtureOptions(t, map[string]any{
 		"floci_endpoint":            flociEndpoint(),
-		"environment":               uniqueEnvironment(),
+		"stack":                     uniqueStack(),
 		"assign_eip":                true,
 		"secondary_private_ip_host": 200,
 		"assign_secondary_eip":      true,
@@ -223,7 +223,7 @@ func TestIAMPolicies(t *testing.T) {
 	t.Parallel()
 
 	ctx := t.Context()
-	env := uniqueEnvironment()
+	env := uniqueStack()
 	// The fixture turns each action into a full policy document.
 	actions := map[string]string{
 		"describe_instances": "ec2:DescribeInstances",
@@ -231,7 +231,7 @@ func TestIAMPolicies(t *testing.T) {
 	}
 	opts := fixtureOptions(t, map[string]any{
 		"floci_endpoint":     flociEndpoint(),
-		"environment":        env,
+		"stack":              env,
 		"iam_policy_actions": actions,
 	})
 	defer terraform.DestroyContext(t, ctx, opts)
@@ -301,10 +301,10 @@ func TestSecurityGroup(t *testing.T) {
 	t.Run("custom rules replace the defaults", func(t *testing.T) {
 		t.Parallel()
 
-		env := uniqueEnvironment()
+		env := uniqueStack()
 		opts := fixtureOptions(t, map[string]any{
 			"floci_endpoint": flociEndpoint(),
-			"environment":    env,
+			"stack":          env,
 			"sg_rules": map[string]any{
 				"HTTP": map[string]any{"type": "ingress", "from_port": "80", "to_port": "80", "protocol": "tcp", "cidr": "10.0.0.0/8"},
 				"DNS":  map[string]any{"type": "egress", "from_port": "53", "to_port": "53", "protocol": "udp", "cidr": "10.0.0.0/8"},
@@ -326,10 +326,10 @@ func TestSecurityGroup(t *testing.T) {
 	t.Run("existing group is used and none is created", func(t *testing.T) {
 		t.Parallel()
 
-		env := uniqueEnvironment()
+		env := uniqueStack()
 		opts := fixtureOptions(t, map[string]any{
 			"floci_endpoint":              flociEndpoint(),
-			"environment":                 env,
+			"stack":                       env,
 			"use_existing_security_group": true,
 		})
 		defer terraform.DestroyContext(t, ctx, opts)
@@ -367,11 +367,11 @@ func TestRoute53Record(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			t.Parallel()
 
-			env := uniqueEnvironment()
+			env := uniqueStack()
 			zone := env + ".internal"
 			opts := fixtureOptions(t, map[string]any{
 				"floci_endpoint":   flociEndpoint(),
-				"environment":      env,
+				"stack":            env,
 				"route53_zone":     zone,
 				"route53_a_record": tc.record,
 			})
@@ -420,7 +420,7 @@ func flociEndpoint() string {
 	return defaultFlociEndpoint
 }
 
-func uniqueEnvironment() string {
+func uniqueStack() string {
 	return "terratest-" + strings.ToLower(random.UniqueID())
 }
 
